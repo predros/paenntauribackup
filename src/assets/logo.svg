@@ -1,0 +1,14 @@
+<svg width="250" height="256" xmlns="http://www.w3.org/2000/svg">
+    <path d="M174,231 L188,255 H140 L154,231 Z" fill="#969595" />
+    <path d="M154,231 L140,255 L123,240 L137,225 Z" fill="#656464" />
+
+    <path d="M59,170 L64,180 H17 L34,152 Z" fill="#969595" />
+    <path d="M34,152 L17,180 L0,165 L21,143 Z" fill="#656464" />
+
+    <path d="M146,91 H249 V161 H183 V231 H146 Z" fill="#A3C0B4" />
+    <path d="M156,101 H167 L238,151 H173 L156,139 Z" fill="#638A79" />
+    <path d="M167,101 H238 V151 Z" fill="#4B685C" />
+    <path d="M173,151 V221 H156 V139 Z" fill="#4B685C" />
+    <path d="M249,91 H146 L16,0 H119 Z" fill="#638A79" />
+    <path d="M16,0 L146,91 V231 L16,140 Z" fill="#4B685C" />
+</svg>

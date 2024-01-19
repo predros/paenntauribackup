@@ -1,0 +1,290 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="200"
+   height="200"
+   viewBox="0 0 52.916665 52.916666"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="rectangle.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="true"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="90.863222"
+     inkscape:cy="94.221979"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1"
+     showguides="false" />
+  <defs
+     id="defs1">
+    <marker
+       inkscape:stockid="DimmArrow_Start_n00001"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="DimmArrow_Start_n00001"
+       style="overflow:visible">
+      <path
+         d="M 0.0,0.0 L -4.000000,0.705308 L -4.000000,-0.705308 L 0.0,0.0 z "
+         style="fill:#333333;fill-opacity:1.0;fill-rule:evenodd;stroke:none;stroke-opacity:1.0;stroke-width:1.0"
+         transform="scale (2.5)rotate(180)translate (4.0,0)"
+         id="path12" />
+    </marker>
+    <marker
+       inkscape:stockid="DimmArrow_End_n00001"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="DimmArrow_End_n00001"
+       style="overflow:visible">
+      <path
+         d="M 0.0,0.0 L -4.000000,0.705308 L -4.000000,-0.705308 L 0.0,0.0 z "
+         style="fill:#333333;fill-opacity:1.0;fill-rule:evenodd;stroke:none;stroke-opacity:1.0;stroke-width:1.0"
+         transform="scale (2.5)translate (4.0,0)"
+         id="path13" />
+    </marker>
+    <marker
+       inkscape:stockid="DimmArrow_Start_n00002"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="DimmArrow_Start_n00002"
+       style="overflow:visible">
+      <path
+         d="M 0.0,0.0 L -4.000000,0.705308 L -4.000000,-0.705308 L 0.0,0.0 z "
+         style="fill:#333333;fill-opacity:1.0;fill-rule:evenodd;stroke:none;stroke-opacity:1.0;stroke-width:1.0"
+         transform="scale (2.5)rotate(180)translate (4.0,0)"
+         id="path23" />
+    </marker>
+    <marker
+       inkscape:stockid="DimmArrow_End_n00002"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="DimmArrow_End_n00002"
+       style="overflow:visible">
+      <path
+         d="M 0.0,0.0 L -4.000000,0.705308 L -4.000000,-0.705308 L 0.0,0.0 z "
+         style="fill:#333333;fill-opacity:1.0;fill-rule:evenodd;stroke:none;stroke-opacity:1.0;stroke-width:1.0"
+         transform="scale (2.5)translate (4.0,0)"
+         id="path24" />
+    </marker>
+    <marker
+       inkscape:stockid="DimmArrow_Start_n00003"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="DimmArrow_Start_n00003"
+       style="overflow:visible">
+      <path
+         d="M 0.0,0.0 L -3.000000,0.528981 L -3.000000,-0.528981 L 0.0,0.0 z "
+         style="fill:#333333;fill-opacity:1.0;fill-rule:evenodd;stroke:none;stroke-opacity:1.0;stroke-width:1.0"
+         transform="scale (3.3333333333333335)rotate(180)translate (3.0,0)"
+         id="path42" />
+    </marker>
+    <marker
+       inkscape:stockid="DimmArrow_End_n00003"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="DimmArrow_End_n00003"
+       style="overflow:visible">
+      <path
+         d="M 0.0,0.0 L -3.000000,0.528981 L -3.000000,-0.528981 L 0.0,0.0 z "
+         style="fill:#333333;fill-opacity:1.0;fill-rule:evenodd;stroke:none;stroke-opacity:1.0;stroke-width:1.0"
+         transform="scale (3.3333333333333335)translate (3.0,0)"
+         id="path43" />
+    </marker>
+    <marker
+       inkscape:stockid="DimmArrow_Start_n00004"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="DimmArrow_Start_n00004"
+       style="overflow:visible">
+      <path
+         d="M 0.0,0.0 L -3.000000,0.528981 L -3.000000,-0.528981 L 0.0,0.0 z "
+         style="fill:#333333;fill-opacity:1.0;fill-rule:evenodd;stroke:none;stroke-opacity:1.0;stroke-width:1.0"
+         transform="scale (3.3333333333333335)rotate(180)translate (3.0,0)"
+         id="path57" />
+    </marker>
+    <marker
+       inkscape:stockid="DimmArrow_End_n00004"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="DimmArrow_End_n00004"
+       style="overflow:visible">
+      <path
+         d="M 0.0,0.0 L -3.000000,0.528981 L -3.000000,-0.528981 L 0.0,0.0 z "
+         style="fill:#333333;fill-opacity:1.0;fill-rule:evenodd;stroke:none;stroke-opacity:1.0;stroke-width:1.0"
+         transform="scale (3.3333333333333335)translate (3.0,0)"
+         id="path58" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Camada 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.529167"
+       id="rect1"
+       width="31.177641"
+       height="41.746796"
+       x="5.9417481"
+       y="0.2645835" />
+    <g
+       inkscape:label="Dim"
+       id="g16"
+       transform="matrix(0.99861655,0,0,0.99862758,-2.3721793,3.6312027e-4)"
+       style="stroke-width:1.00138">
+      <path
+         inkscape:label="none"
+         style="fill:none;fill-opacity:1;stroke:#333333;stroke-width:0.400552;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         d="m 8.3254452,43.668752 v 9.12"
+         id="path14" />
+      <path
+         inkscape:label="none"
+         style="fill:none;fill-opacity:1;stroke:#333333;stroke-width:0.400552;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         d="m 39.546278,43.668752 v 9.12"
+         id="path15" />
+      <path
+         inkscape:label="dim"
+         style="fill:none;fill-opacity:1;stroke:#333333;stroke-width:0.400552;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#DimmArrow_Start_n00001);marker-end:url(#DimmArrow_End_n00001)"
+         d="M 12.325445,51.668752 H 35.546278"
+         id="path16" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:5.26316px;line-height:100%;font-family:Sans;text-align:center;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#333333;fill-opacity:1;stroke:none;stroke-width:1.00276"
+         x="0"
+         y="0"
+         transform="translate(23.935862,50.068752)"
+         id="text16"><tspan
+           sodipodi:role="line"
+           x="2.1886081e-08"
+           y="0"
+           id="tspan16"
+           style="stroke-width:1.00138">B</tspan></text>
+    </g>
+    <g
+       inkscape:label="Dim"
+       id="g27"
+       transform="translate(-2.3836971)">
+      <path
+         inkscape:label="none"
+         style="fill:none;fill-opacity:1;stroke:#333333;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         d="m 41.103085,42.01138 h 8.32"
+         id="path25" />
+      <path
+         inkscape:label="none"
+         style="fill:none;fill-opacity:1;stroke:#333333;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+         d="m 41.103085,0.26458349 h 8.32"
+         id="path26" />
+      <path
+         inkscape:label="dim"
+         style="fill:none;fill-opacity:1;stroke:#333333;stroke-width:0.4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#DimmArrow_Start_n00002);marker-end:url(#DimmArrow_End_n00002)"
+         d="M 48.303085,38.01138 V 4.2645835"
+         id="path27" />
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-weight:normal;font-size:5.26316px;line-height:100%;font-family:Sans;text-align:end;letter-spacing:0px;word-spacing:0px;text-anchor:end;fill:#333333;fill-opacity:1;stroke:none"
+         x="0"
+         y="0"
+         transform="translate(46.703085,23.137982)"
+         id="text27"><tspan
+           sodipodi:role="line"
+           x="3.7718564e-08"
+           y="0"
+           id="tspan27">H</tspan></text>
+    </g>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.529169"
+       id="rect1-0"
+       width="15.058496"
+       height="20.25449"
+       x="14.001321"
+       y="11.010736" />
+    <g
+       inkscape:label="Dim"
+       id="g46">
+      <path
+         inkscape:label="none"
+         style="fill:none;fill-opacity:1.0;stroke:#333333;stroke-dasharray:none;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1.0;stroke-width:0.3"
+         d="m 14.001321 32.465225000000004 -0.0,6.24"
+         id="path44" />
+      <path
+         inkscape:label="none"
+         style="fill:none;fill-opacity:1.0;stroke:#333333;stroke-dasharray:none;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1.0;stroke-width:0.3"
+         d="m 29.059817 32.465225000000004 -0.0,6.24"
+         id="path45" />
+      <path
+         inkscape:label="dim"
+         style="fill:none;fill-opacity:1.0;marker-end:url(#DimmArrow_End_n00003);marker-start:url(#DimmArrow_Start_n00003);stroke:#333333;stroke-dasharray:none;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1.0;stroke-width:0.3"
+         d="M  17.001321,37.865225 26.059817,37.865225"
+         id="path46" />
+      <text
+         xml:space="preserve"
+         style="fill:#333333;fill-opacity:1.0;font-family:Sans;font-size:3.9473684210526314px;font-style:normal;font-weight:normal;letter-spacing:0px;line-height:100%;stroke:none;text-align:center;text-anchor:middle;word-spacing:0px"
+         x="0"
+         y="0"
+         transform="translate(21.530569 36.665225)"
+         id="text46"><tspan
+           sodipodi:role="line"
+           x="0"
+           y="0"
+           id="tspan46">b</tspan></text>
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:0.529167"
+       d="M 29.059817,31.265225 V 11.010736"
+       id="path47" />
+    <g
+       inkscape:label="Dim"
+       id="g61">
+      <path
+         inkscape:label="none"
+         style="fill:none;fill-opacity:1.0;stroke:#333333;stroke-dasharray:none;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1.0;stroke-width:0.3"
+         d="m 30.259816999999998 31.265225 5.640000000000001,0.0"
+         id="path59" />
+      <path
+         inkscape:label="none"
+         style="fill:none;fill-opacity:1.0;stroke:#333333;stroke-dasharray:none;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1.0;stroke-width:0.3"
+         d="m 30.259816999999998 11.010736 5.640000000000001,0.0"
+         id="path60" />
+      <path
+         inkscape:label="dim"
+         style="fill:none;fill-opacity:1.0;marker-end:url(#DimmArrow_End_n00004);marker-start:url(#DimmArrow_Start_n00004);stroke:#333333;stroke-dasharray:none;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1.0;stroke-width:0.3"
+         d="M  35.059816999999995,28.265225 35.059816999999995,14.010736"
+         id="path61" />
+      <text
+         xml:space="preserve"
+         style="fill:#333333;fill-opacity:1.0;font-family:Sans;font-size:3.9473684210526314px;font-style:normal;font-weight:normal;letter-spacing:0px;line-height:100%;stroke:none;text-align:end;text-anchor:end;word-spacing:0px"
+         x="0"
+         y="0"
+         transform="translate(33.859817 22.637981)"
+         id="text61"><tspan
+           sodipodi:role="line"
+           x="0"
+           y="0"
+           id="tspan61">h</tspan></text>
+    </g>
+  </g>
+</svg>

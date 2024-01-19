@@ -1,0 +1,64 @@
+{
+  "build": {
+    "beforeDevCommand": "yarn dev",
+    "beforeBuildCommand": "yarn build",
+    "devPath": "http://localhost:1420",
+    "distDir": "../dist"
+  },
+  "package": {
+    "productName": "paenn",
+    "version": "0.0.1"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": true,
+      "shell": {
+        "all": false,
+        "open": true
+      },
+      "dialog": {
+        "all": true,
+        "ask": true,
+        "confirm": true,
+        "message": true,
+        "open": true,
+        "save": true
+      }
+    },
+    "bundle": {
+      "active": true,
+      "targets": "all",
+      "identifier": "eng.okra.paenn",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ]
+    },
+    "security": {
+      "csp": null
+    },
+    "windows": [
+      {
+        "label": "main",
+        "fullscreen": false,
+        "maximized": true,
+        "resizable": true,
+        "title": "PAENN",
+        "minWidth": 950,
+        "minHeight": 650,
+        "visible": false
+      },
+      {
+        "label": "splashscreen",
+        "url": "splashscreen.html",
+        "width": 300,
+        "height": 150,
+        "decorations": false,
+        "center": true
+      }
+    ]
+  }
+}

@@ -1,30 +1,45 @@
 <template>
   <div class="toolbar">
-    <v-btn-group rounded="0">
-      <v-btn @click="async () => await store.newFile()">
+    <v-btn-group
+      rounded="0"
+      variant="text"
+    >
+      <v-btn @click="async () => await store.fileNew()">
         <v-icon size="28">mdi-file</v-icon>
-        <v-tooltip activator="parent" location="bottom">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+        >
           {{ t("toolbars.top.new") }}
         </v-tooltip>
       </v-btn>
 
-      <v-btn @click="async () => await store.openFile()">
+      <v-btn @click="async () => await store.fileOpen()">
         <v-icon size="28">mdi-folder-open</v-icon>
-        <v-tooltip activator="parent" location="bottom">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+        >
           {{ t("toolbars.top.open") }}
         </v-tooltip>
       </v-btn>
 
-      <v-btn @click="async () => await store.saveFile()">
+      <v-btn @click="async () => await store.fileSave()">
         <v-icon size="28">mdi-content-save</v-icon>
-        <v-tooltip activator="parent" location="bottom">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+        >
           {{ t("toolbars.top.save") }}
         </v-tooltip>
       </v-btn>
 
-      <v-btn @click="async () => await store.saveFileAs()">
+      <v-btn @click="async () => await store.fileSaveAs()">
         <v-icon size="28">mdi-content-save-move</v-icon>
-        <v-tooltip activator="parent" location="bottom">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+        >
           {{ t("toolbars.top.saveAs") }}
         </v-tooltip>
       </v-btn>
@@ -34,10 +49,13 @@
           store.historyLength.undo == 0 ||
           store.current.sideBarType == SideBarType.Result
         "
-        @click="() => store.undo()"
+        @click="() => store.appUndo()"
       >
         <v-icon size="28">mdi-undo</v-icon>
-        <v-tooltip activator="parent" location="bottom">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+        >
           {{ t("toolbars.top.undo") }}
         </v-tooltip>
       </v-btn>
@@ -47,33 +65,49 @@
           store.historyLength.redo == 0 ||
           store.current.sideBarType == SideBarType.Result
         "
-        @click="() => store.redo()"
+        @click="() => store.appRedo()"
       >
         <v-icon size="28">mdi-redo</v-icon>
-        <v-tooltip activator="parent" location="bottom">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+        >
           {{ t("toolbars.top.redo") }}
         </v-tooltip>
       </v-btn>
 
       <v-btn @click="() => (settings.showSettingsDialog = true)">
         <v-icon size="28">mdi-cog</v-icon>
-        <v-tooltip activator="parent" location="bottom">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+        >
           {{ t("toolbars.top.settings") }}
         </v-tooltip>
       </v-btn>
 
-      <v-btn @click="() => store.showDialog.loadcases = true" >
-        <IconBase :width="35" :height="35" icon-name="loads">
+      <v-btn @click="() => (store.dialogs.loadcases = true)">
+        <IconBase
+          :width="35"
+          :height="35"
+          icon-name="loads"
+        >
           <IconLoads />
         </IconBase>
-        <v-tooltip activator="parent" location="bottom">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+        >
           {{ t("toolbars.top.loadcases") }}
         </v-tooltip>
       </v-btn>
 
-      <v-btn @click="() => store.runAnalysisLinear()">
+      <v-btn @click="() => store.analysisRun()">
         <v-icon size="28">mdi-play</v-icon>
-        <v-tooltip activator="parent" location="bottom">
+        <v-tooltip
+          activator="parent"
+          location="bottom"
+        >
           {{ t("toolbars.top.run") }}
         </v-tooltip>
       </v-btn>
@@ -114,7 +148,7 @@ const settings = useSettings();
 const loadcase = ref<number>(0);
 
 function onCaseChange(): void {
-  store.changeCurrentLoadcase(loadcase.value);
+  store.loadcaseChangeCurrent(loadcase.value);
 }
 </script>
 

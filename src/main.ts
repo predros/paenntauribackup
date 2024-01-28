@@ -12,7 +12,7 @@ import { createVuetify } from "vuetify";
 import { createVueI18nAdapter } from "vuetify/locale/adapters/vue-i18n";
 
 import App from "./App.vue";
-import { ThemeDefinition } from "vuetify/dist/vuetify.js";
+import { type ThemeDefinition } from "vuetify/dist/vuetify.js";
 
 const pinia = createPinia();
 

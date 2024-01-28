@@ -35,6 +35,7 @@ export default {
     sectionInUse:
       "Não é possível apagar uma seção aplicada a uma ou mais barras.",
     sectionNameInUse: "Já existe uma seção com este nome.",
+    singleLoadcase: "Não é possível apagar todos os casos de carga do projeto.",
     singleMaterial: "Não é possível apagar todos os materiais do projeto.",
     singleSection: "Não é possível apagar todas as seções do projeto.",
     unstableStructure: "Falha na análise: estrutura instável!",
@@ -51,16 +52,43 @@ export default {
     cancel: "Cancelar",
     clear: "Limpar",
     close: "Fechar",
+    combinationNew: "Nova combinação",
+    combinationFactors: "Fatores de carga",
     delete: "Apagar",
     edit: "Editar",
+    loadcaseNew: "Novo caso de carga",
     manageMaterials: "Gerenciar materiais",
     manageSections: "Gerenciar seções",
-    newMaterial: "Novo material",
-    newSection: "Nova seção",
+    materialNew: "Novo material",
+    sectionNew: "Nova seção",
     save: "Salvar",
     saveAndClose: "Salvar e fechar",
   },
   dialogs: {
+    combinationFactors: {
+      title: "Fatores de combinação",
+    },
+    loadcases: {
+      combinations: {
+        areYouSure:
+          "Tem certeza que deseja apagar a combinação <b>{0}</b>? Esta ação não pode ser desfeita.",
+        deleting: "Apagando combinação: {0}",
+        editing: "Editando combinação: {0}",
+        name: "Nome",
+        new: "Nova combinação",
+        title: "Combinações",
+      },
+      loadcases: {
+        areYouSure:
+          "Tem certeza que deseja apagar o caso de carga <b>{0}</b>? Esta ação não pode ser desfeita.",
+        deleting: "Apagando caso de carga: {0}",
+        editing: "Editando caso de carga: {0}",
+        name: "Nome",
+        new: "Novo caso de carga",
+        title: "Casos de carga",
+      },
+      title: "Casos de carga/combinações",
+    },
     materials: {
       areYouSure:
         "Tem certeza que deseja apagar o material <b>{0}</b>? Esta ação não pode ser desfeita.",
@@ -68,7 +96,7 @@ export default {
       editing: "Editando material: {0}",
       elasticity: "Elasticidade",
       name: "Nome",
-      newMaterial: "Novo material",
+      new: "Novo material",
       title: "Gerenciar materiais",
       thermal: "Coef. térmico",
     },
@@ -78,8 +106,8 @@ export default {
         no: "Não",
       },
       fileType: "Projeto PAENN",
-      openFileTitle: "Abrir projeto",
-      saveFileTitle: "Salvar projeto",
+      fileOpenTitle: "Abrir projeto",
+      fileSaveTitle: "Salvar projeto",
       unsavedChanges:
         "Há mudanças não salvas no projeto. Tem certeza que deseja descartá-las?",
       unsavedChangesTitle: "Descartar mudanças",
@@ -92,6 +120,7 @@ export default {
       editing: "Editando seção: {0}",
       inertia: "Inércia",
       name: "Nome",
+      new: "Nova seção",
       title: "Gerenciar seções",
       type: "Tipo",
       types: {
@@ -151,12 +180,11 @@ export default {
     validNumber: "Informe um valor válido.",
   },
   menu: {
-    analysis: {
-      self: "Análise",
-    },
     edit: {
       redo: "Refazer",
+      selectedDelete: "Apagar seleção",
       self: "Editar",
+      settings: "Configurações",
       undo: "Desfazer",
     },
     file: {
@@ -166,12 +194,6 @@ export default {
       save: "Salvar",
       saveAs: "Salvar como...",
       self: "Arquivo",
-    },
-    help: {
-      self: "Ajuda",
-    },
-    structure: {
-      self: "Estrutura",
     },
   },
   sidebars: {

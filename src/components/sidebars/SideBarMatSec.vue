@@ -5,7 +5,10 @@
     </v-card-title>
 
     <v-card-text>
-      <v-form ref="form" validate-on="submit">
+      <v-form
+        ref="form"
+        validate-on="submit"
+      >
         <v-row>
           <v-select
             v-model="store.current.material"
@@ -30,7 +33,11 @@
             clearable
           >
             <template #prepend-inner>
-              <IconBase :width="30" :height="30" :icon-color="'#767676'">
+              <IconBase
+                :width="30"
+                :height="30"
+                :icon-color="'#767676'"
+              >
                 <IconSections />
               </IconBase>
             </template>
@@ -39,32 +46,51 @@
       </v-form>
 
       <v-row class="pt-10 px-2">
-        <v-btn block color="primary" @click="onSubmit">
+        <v-btn
+          block
+          color="primary"
+          @click="onSubmit"
+        >
           {{ t("buttons.applyToSelection") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onManageMaterials">
+        <v-btn
+          block
+          @click="onManageMaterials"
+        >
           {{ t("buttons.manageMaterials") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onManageSections">
+        <v-btn
+          block
+          @click="onManageSections"
+        >
           {{ t("buttons.manageSections") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onClose">
+        <v-btn
+          block
+          @click="onClose"
+        >
           {{ t("buttons.close") }}
         </v-btn>
       </v-row>
     </v-card-text>
 
-    <v-dialog v-model="dialog.material" persistent>
+    <v-dialog
+      v-model="dialog.material"
+      persistent
+    >
       <DialogMaterials @close="onCloseDialog" />
     </v-dialog>
 
-    <v-dialog v-model="dialog.section" persistent>
+    <v-dialog
+      v-model="dialog.section"
+      persistent
+    >
       <DialogSections @close="onCloseDialog" />
     </v-dialog>
   </div>
@@ -92,7 +118,10 @@ const materialsList = computed(() => store.materialsList);
 const sectionsList = computed(() => store.sectionsList);
 
 async function onSubmit(): Promise<void> {
-  await store.applyMatSec(store.current.material, store.current.section);
+  await store.selectedApplyMatSec(
+    store.current.material,
+    store.current.section,
+  );
 }
 
 function onManageMaterials(): void {

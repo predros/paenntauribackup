@@ -1,6 +1,7 @@
 use super::Direction;
 
 #[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct NodeDTO {
     pub id: usize,
     pub x: f64,

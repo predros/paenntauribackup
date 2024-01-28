@@ -1,9 +1,12 @@
 <template>
-  <v-image v-if="valid" :config="shapeConfig" />
+  <v-image
+    v-if="valid"
+    :config="shapeConfig"
+  />
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, defineProps } from "vue";
+import { computed, defineProps, onMounted, ref } from "vue";
 import { INode, SupportType } from "@/types/types";
 import { watch } from "vue";
 
@@ -16,13 +19,13 @@ const props = defineProps({
       y: 0,
       hinged: false,
       supports: [false, false, false],
-      support_angle: 0,
+      supportAngle: 0,
       springs: [0, 0, 0],
-      prescribed_displacement: [0, 0, 0],
+      prescribedDisplacements: [0, 0, 0],
       fx: 0,
       fy: 0,
       mz: 0,
-      force_angle: 0,
+      forceAngle: 0,
     }),
   },
   scale: {
@@ -44,7 +47,9 @@ const supportType = computed<SupportType>(() => {
 const source = ref<HTMLImageElement>();
 
 const shapeConfig = computed(() => {
-  if (!source.value) return null;
+  if (!source.value) {
+    return null;
+  }
 
   let x = 0;
   let y = 0;
@@ -93,7 +98,7 @@ const shapeConfig = computed(() => {
   const result = {
     x: props.node.x,
     y: -props.node.y,
-    rotation: -props.node.support_angle + angle,
+    rotation: -props.node.supportAngle + angle,
     scaleX: 1 / props.scale,
     scaleY: 1 / props.scale,
     image: source.value,

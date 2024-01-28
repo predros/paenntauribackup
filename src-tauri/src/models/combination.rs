@@ -7,11 +7,14 @@ pub enum CombinationError {
 }
 
 #[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CombinationDTO {
     pub id: usize,
     pub name: String,
+    pub load_factors: HashMap<usize, f64>,
 }
 
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Combination {
     name: String,
     load_factors: HashMap<usize, f64>,
@@ -35,16 +38,16 @@ impl Combination {
         self.name.clone()
     }
 
-    pub fn set_name(&mut self, name: &str) -> () {
+    pub fn set_name(&mut self, name: &str) {
         self.name = name.to_string();
     }
 
     pub fn add_loadcase(&mut self, id: usize) -> Result<(), CombinationError> {
-        if self.load_factors.contains_key(&id) {
-            return Err(CombinationError::LoadcaseAlreadyExists(id));
+        if let std::collections::hash_map::Entry::Vacant(e) = self.load_factors.entry(id) {
+            e.insert(0.0);
+            Ok(())
         } else {
-            self.load_factors.insert(id, 0.0);
-            return Ok(());
+            Err(CombinationError::LoadcaseAlreadyExists(id))
         }
     }
 
@@ -56,10 +59,7 @@ impl Combination {
     }
 
     pub fn get_factor(&self, id: usize) -> Option<f64> {
-        match self.load_factors.get(&id) {
-            Some(value) => Some(*value),
-            None => None,
-        }
+        self.load_factors.get(&id).copied()
     }
 
     pub fn get_all_factors(&self) -> HashMap<usize, f64> {
@@ -73,7 +73,7 @@ impl Combination {
                 *value = factor;
                 Ok(())
             }
-            None => return Err(CombinationError::InvalidLoadcase(id)),
+            None => Err(CombinationError::InvalidLoadcase(id)),
         }
     }
 }

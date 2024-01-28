@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 #[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MemberDTO {
     pub id: usize,
 

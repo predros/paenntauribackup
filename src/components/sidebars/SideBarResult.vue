@@ -45,7 +45,11 @@
       </v-row>
 
       <v-row class="pt-10 px-2">
-        <v-btn block color="primary" @click="onClose">
+        <v-btn
+          block
+          color="primary"
+          @click="onClose"
+        >
           {{ t("buttons.close") }}
         </v-btn>
       </v-row>
@@ -56,7 +60,7 @@
 <script setup lang="ts">
 import { ClickType, ResultType, SideBarType } from "@/types/types";
 import { useI18n } from "vue-i18n";
-import { ref, watch, computed } from "vue";
+import { computed, ref, watch } from "vue";
 
 import useGlobalStore from "@/state/global";
 
@@ -81,9 +85,9 @@ const resultCases = computed(() => {
   store.combinationsList.forEach((combination) => {
     result.push({
       title: t("sidebars.result.combination") + " " + combination.name,
-      value: { isCombination: true, id: combination.id }
+      value: { isCombination: true, id: combination.id },
     });
-  })
+  });
 
   return result;
 });

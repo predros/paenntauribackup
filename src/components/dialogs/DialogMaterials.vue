@@ -1,5 +1,8 @@
 <template>
-  <v-card class="py-4 px-6" style="min-width: 600px; min-height: 500px">
+  <v-card
+    class="py-4 px-6"
+    style="min-width: 600px; min-height: 500px"
+  >
     <v-card-title class="pb-6">
       {{ t("dialogs.materials.title") }}
     </v-card-title>
@@ -25,15 +28,29 @@
               {{ settings.formatUnit(item.thermal, UnitType.Thermal, false) }}
             </td>
             <td>
-              <v-btn icon elevation="0" @click="onShowForm(item)">
+              <v-btn
+                icon
+                elevation="0"
+                @click="onShowForm(item)"
+              >
                 <v-icon>mdi-pencil</v-icon>
-                <v-tooltip location="bottom" activator="parent">
+                <v-tooltip
+                  location="bottom"
+                  activator="parent"
+                >
                   {{ t("buttons.edit") }}
                 </v-tooltip>
               </v-btn>
-              <v-btn icon elevation="0" @click="onShowDelete(item)">
+              <v-btn
+                icon
+                elevation="0"
+                @click="onShowDelete(item)"
+              >
                 <v-icon>mdi-trash-can</v-icon>
-                <v-tooltip location="bottom" activator="parent">
+                <v-tooltip
+                  location="bottom"
+                  activator="parent"
+                >
                   {{ t("buttons.delete") }}
                 </v-tooltip>
               </v-btn>
@@ -50,27 +67,37 @@
         prepend-icon="mdi-plus"
         @click="() => onShowForm(null)"
       >
-        {{ t("buttons.newMaterial") }}
+        {{ t("buttons.materialNew") }}
       </v-btn>
 
-      <v-btn class="pl-3 pr-3" @click="onClose">
+      <v-btn
+        class="pl-3 pr-3"
+        @click="onClose"
+      >
         {{ t("buttons.close") }}
       </v-btn>
     </div>
   </v-card>
 
-  <v-dialog v-model="dialogs.form" persistent width="400">
+  <v-dialog
+    v-model="dialogs.form"
+    persistent
+    width="400"
+  >
     <v-card class="py-4 px-6">
       <v-card-title class="pb-7">
         {{
-          currentMaterial.id == null
-            ? t("dialogs.materials.newMaterial")
+          currentMaterial.id === null
+            ? t("dialogs.materials.new")
             : t("dialogs.materials.editing", [currentMaterial.name])
         }}
       </v-card-title>
 
       <v-card-text>
-        <v-form ref="form" validate-on="submit">
+        <v-form
+          ref="form"
+          validate-on="submit"
+        >
           <v-row>
             <v-text-field
               v-model="formMaterial.name"
@@ -103,22 +130,32 @@
       </v-card-text>
 
       <div class="d-flex justify-end">
-        <v-btn class="pl-3 pr-3 mr-3" color="primary" @click="onSubmitForm">
+        <v-btn
+          class="pl-3 pr-3 mr-3"
+          color="primary"
+          @click="onSubmitForm"
+        >
           {{ t("buttons.save") }}
         </v-btn>
 
-        <v-btn class="pl-3 pr-3" @click="onDialogClose">
+        <v-btn
+          class="pl-3 pr-3"
+          @click="onDialogClose"
+        >
           {{ t("buttons.cancel") }}
         </v-btn>
       </div>
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="dialogs.delete" persistent>
+  <v-dialog
+    v-model="dialogs.delete"
+    persistent
+  >
     <v-card class="py-4 px-6">
       <v-card-title>
         {{
-          currentMaterial == null
+          currentMaterial === null
             ? t("errors.ERROR")
             : t("dialogs.materials.deleting", [currentMaterial.name])
         }}
@@ -130,7 +167,7 @@
 
       <div class="d-flex justify-end">
         <v-btn
-          v-if="currentMaterial.id != null"
+          v-if="currentMaterial.id !== null"
           class="pl-3 pr-3 mr-3"
           color="primary"
           @click="onSubmitDelete"
@@ -138,7 +175,10 @@
           {{ t("buttons.delete") }}
         </v-btn>
 
-        <v-btn class="pl-3 pr-3" @click="onDialogClose">
+        <v-btn
+          class="pl-3 pr-3"
+          @click="onDialogClose"
+        >
           {{ t("buttons.cancel") }}
         </v-btn>
       </div>
@@ -147,7 +187,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, defineEmits } from "vue";
+import { defineEmits, reactive, ref } from "vue";
 import { IMaterial } from "@/types/types";
 import { isValidNumber, parseNumber } from "@/helper/misc";
 import { VForm } from "vuetify/components";
@@ -216,7 +256,7 @@ function onClose(): void {
 }
 
 function onShowForm(material: IMaterial | null) {
-  if (material == null) {
+  if (material === null) {
     currentMaterial.id = null;
     currentMaterial.name = "";
 
@@ -237,13 +277,13 @@ function onShowForm(material: IMaterial | null) {
 
 function onShowDelete(material: IMaterial) {
   if (store.materialsList.length < 2) {
-    store.showAlert("alerts.singleMaterial");
+    store.appAlert("alerts.singleMaterial");
     return;
   }
 
   const inUse = members.membersList.some((m) => m.material == material.id);
   if (inUse) {
-    store.showAlert("alerts.materialInUse");
+    store.appAlert("alerts.materialInUse");
     return;
   }
 
@@ -255,7 +295,9 @@ function onShowDelete(material: IMaterial) {
 }
 
 async function onSubmitForm() {
-  if (!form.value) return;
+  if (!form.value) {
+    return;
+  }
 
   const { valid } = await form.value.validate();
 
@@ -265,17 +307,17 @@ async function onSubmitForm() {
     );
 
     if (sameName != undefined && sameName.id != currentMaterial.id) {
-      store.showAlert(t("alerts.materialNameInUse"));
+      store.appAlert(t("alerts.materialNameInUse"));
       return;
     }
 
     const elasticity = parseNumber(formMaterial.elasticity);
     const thermal = parseNumber(formMaterial.thermal);
 
-    if (currentMaterial.id == null) {
-      await store.newMaterial(formMaterial.name, elasticity, thermal);
+    if (currentMaterial.id === null) {
+      await store.materialNew(formMaterial.name, elasticity, thermal);
     } else {
-      await store.updateMaterial(
+      await store.materialUpdate(
         currentMaterial.id,
         formMaterial.name,
         elasticity,
@@ -287,8 +329,10 @@ async function onSubmitForm() {
 }
 
 async function onSubmitDelete() {
-  if (currentMaterial.id == null) return;
-  await store.deleteMaterial(currentMaterial.id);
+  if (currentMaterial.id === null) {
+    return;
+  }
+  await store.materialDelete(currentMaterial.id);
   onDialogClose();
 }
 

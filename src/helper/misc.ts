@@ -5,7 +5,7 @@
  * @returns The parsed number (valid or NaN).
  */
 
-export function parseNumber(value: string) : number {
+export function parseNumber(value: string): number {
   const corrected = value.replace(",", ".");
   return Number(corrected);
 }
@@ -23,8 +23,14 @@ export function isValidNumber(
   canBeZero: boolean = true,
 ): boolean {
   const parsed = parseNumber(value);
-  if (Number.isNaN(parsed)) return false;
-  if (!canBeZero && parsed == 0) return false;
-  if (!canBeNegative && parsed < 0) return false;
+  if (Number.isNaN(parsed)) {
+    return false;
+  }
+  if (!canBeZero && parsed == 0) {
+    return false;
+  }
+  if (!canBeNegative && parsed < 0) {
+    return false;
+  }
   return true;
 }

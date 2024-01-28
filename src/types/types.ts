@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export enum Direction {
   None = 0,
   X,
@@ -58,13 +59,13 @@ export interface INode {
   y: number;
   hinged: boolean;
   supports: boolean[];
-  support_angle: number;
+  supportAngle: number;
   springs: number[];
-  prescribed_displacements: number[];
+  prescribedDisplacements: number[];
   fx: number;
   fy: number;
   mz: number;
-  force_angle: number;
+  forceAngle: number;
 }
 
 export interface IMember {
@@ -87,10 +88,10 @@ export interface IMember {
   qy0: number;
   qx1: number;
   qy1: number;
-  is_global: boolean;
+  isGlobal: boolean;
 
-  t_sup: number;
-  t_inf: number;
+  tSup: number;
+  tInf: number;
 }
 
 export interface IMaterial {
@@ -105,9 +106,9 @@ export interface ISection {
   name: string;
   inertia: number;
   area: number;
-  y_sup: number;
-  y_inf: number;
-  section_type: SectionType;
+  ySup: number;
+  yInf: number;
+  sectionType: SectionType;
   params: number[];
 }
 
@@ -119,6 +120,7 @@ export interface ILoadcase {
 export interface ICombination {
   id: number;
   name: string;
+  loadFactors: Record<number, number>;
 }
 
 export interface IMemberResult {
@@ -131,10 +133,10 @@ export interface IMemberResult {
   shear: number[];
   moment: number[];
 
-  max_moment: number[];
-  min_moment: number[];
-  vert_shear: number[];
-  vert_normal: number[];
+  maxMoment: number[];
+  minMoment: number[];
+  vertShear: number[];
+  vertNormal: number[];
 }
 
 export interface INodeReaction {
@@ -144,8 +146,8 @@ export interface INodeReaction {
   mz: number;
 }
 
-export type ResultsDict = { [key: number]: IMemberResult[] };
-export type ReactionsDict = { [key: number]: INodeReaction[] };
+export type ResultsDict = Record<number, IMemberResult[]>;
+export type ReactionsDict = Record<number, INodeReaction[]>;
 
 export interface KonvaWheelEvent {
   evt: WheelEvent;

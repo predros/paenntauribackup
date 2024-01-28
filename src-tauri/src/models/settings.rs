@@ -1,4 +1,5 @@
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Settings {
     pub dark_theme: bool,
     pub locale: String,
@@ -8,6 +9,7 @@ pub struct Settings {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UnitSettings {
     pub length: UnitLength,
     pub force: UnitForce,
@@ -27,6 +29,7 @@ pub struct UnitSettings {
 }
 
 #[derive(Clone, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct UnitPrecision {
     pub length: (usize, bool),
     pub force: (usize, bool),

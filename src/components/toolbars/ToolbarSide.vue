@@ -14,7 +14,10 @@
       @click="onChanged(SideBarType.Select)"
     >
       <v-icon size="28">mdi-cursor-default</v-icon>
-      <v-tooltip activator="parent" location="end">
+      <v-tooltip
+        activator="parent"
+        location="end"
+      >
         {{ t("toolbars.side.select") }}
       </v-tooltip>
     </v-btn>
@@ -25,10 +28,17 @@
       :value="SideBarType.NewNode"
       @click="onChanged(SideBarType.NewNode)"
     >
-      <icon-base :width="32" :height="32" icon-name="node">
+      <icon-base
+        :width="32"
+        :height="32"
+        icon-name="node"
+      >
         <IconNode />
       </icon-base>
-      <v-tooltip activator="parent" location="end">
+      <v-tooltip
+        activator="parent"
+        location="end"
+      >
         {{ t("toolbars.side.node") }}
       </v-tooltip>
     </v-btn>
@@ -39,10 +49,17 @@
       :value="SideBarType.MatSec"
       @click="onChanged(SideBarType.MatSec)"
     >
-      <icon-base :width="32" :height="32" icon-name="sections">
+      <icon-base
+        :width="32"
+        :height="32"
+        icon-name="sections"
+      >
         <IconSections />
       </icon-base>
-      <v-tooltip activator="parent" location="end">
+      <v-tooltip
+        activator="parent"
+        location="end"
+      >
         {{ t("toolbars.side.matSec") }}
       </v-tooltip>
     </v-btn>
@@ -53,10 +70,17 @@
       :value="SideBarType.NewMember"
       @click="onChanged(SideBarType.NewMember)"
     >
-      <icon-base :width="32" :height="32" icon-name="member">
+      <icon-base
+        :width="32"
+        :height="32"
+        icon-name="member"
+      >
         <IconMember />
       </icon-base>
-      <v-tooltip activator="parent" location="end">
+      <v-tooltip
+        activator="parent"
+        location="end"
+      >
         {{ t("toolbars.side.member") }}
       </v-tooltip>
     </v-btn>
@@ -67,10 +91,17 @@
       :value="SideBarType.Supports"
       @click="onChanged(SideBarType.Supports)"
     >
-      <icon-base :width="32" :height="32" icon-name="supports">
+      <icon-base
+        :width="32"
+        :height="32"
+        icon-name="supports"
+      >
         <IconSupports />
       </icon-base>
-      <v-tooltip activator="parent" location="end">
+      <v-tooltip
+        activator="parent"
+        location="end"
+      >
         {{ t("toolbars.side.supports") }}
       </v-tooltip>
     </v-btn>
@@ -81,10 +112,17 @@
       :value="SideBarType.Hinges"
       @click="onChanged(SideBarType.Hinges)"
     >
-      <icon-base :width="32" :height="32" icon-name="hinge">
+      <icon-base
+        :width="32"
+        :height="32"
+        icon-name="hinge"
+      >
         <IconHinges />
       </icon-base>
-      <v-tooltip activator="parent" location="end">
+      <v-tooltip
+        activator="parent"
+        location="end"
+      >
         {{ t("toolbars.side.hinges") }}
       </v-tooltip>
     </v-btn>
@@ -95,10 +133,17 @@
       :value="SideBarType.NodalForces"
       @click="onChanged(SideBarType.NodalForces)"
     >
-      <icon-base :width="32" :height="32" icon-name="force">
+      <icon-base
+        :width="32"
+        :height="32"
+        icon-name="force"
+      >
         <IconForce />
       </icon-base>
-      <v-tooltip activator="parent" location="end">
+      <v-tooltip
+        activator="parent"
+        location="end"
+      >
         {{ t("toolbars.side.forces") }}
       </v-tooltip>
     </v-btn>
@@ -109,10 +154,17 @@
       :value="SideBarType.MemberLoads"
       @click="onChanged(SideBarType.MemberLoads)"
     >
-      <icon-base :width="32" :height="32" icon-name="loads">
+      <icon-base
+        :width="32"
+        :height="32"
+        icon-name="loads"
+      >
         <IconLoads />
       </icon-base>
-      <v-tooltip activator="parent" location="end">
+      <v-tooltip
+        activator="parent"
+        location="end"
+      >
         {{ t("toolbars.side.loads") }}
       </v-tooltip>
     </v-btn>
@@ -125,7 +177,10 @@
     >
       <v-icon size="28">mdi-thermometer</v-icon>
 
-      <v-tooltip activator="parent" location="end">
+      <v-tooltip
+        activator="parent"
+        location="end"
+      >
         {{ t("toolbars.side.temperature") }}
       </v-tooltip>
     </v-btn>
@@ -141,7 +196,7 @@ import IconMember from "@/components/icons/IconMember.vue";
 import IconNode from "@/components/icons/IconNode.vue";
 import IconSections from "@/components/icons/IconSections.vue";
 import IconSupports from "@/components/icons/IconSupports.vue";
-import { SideBarType, ClickType } from "@/types/types";
+import { ClickType, SideBarType } from "@/types/types";
 import useGlobalStore from "@/state/global";
 import { useI18n } from "vue-i18n";
 

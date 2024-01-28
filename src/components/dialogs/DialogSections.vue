@@ -1,5 +1,8 @@
 <template>
-  <v-card class="py-4 px-6" style="min-width: 600px; min-height: 500px">
+  <v-card
+    class="py-4 px-6"
+    style="min-width: 600px; min-height: 500px"
+  >
     <v-card-title class="pb-6">
       {{ t("dialogs.sections.title") }}
     </v-card-title>
@@ -47,21 +50,35 @@
         <template #item="{ item }">
           <tr>
             <td>{{ item.name }}</td>
-            <td>{{ getSectionTypeName(item.section_type) }}</td>
+            <td>{{ getSectionTypeName(item.sectionType) }}</td>
             <td>
               {{ settings.formatUnit(item.inertia, UnitType.Inertia, false) }}
             </td>
             <td>{{ settings.formatUnit(item.area, UnitType.Area, false) }}</td>
             <td>
-              <v-btn icon elevation="0" @click="onShowForm(item)">
+              <v-btn
+                icon
+                elevation="0"
+                @click="onShowForm(item)"
+              >
                 <v-icon>mdi-pencil</v-icon>
-                <v-tooltip location="bottom" activator="parent">
+                <v-tooltip
+                  location="bottom"
+                  activator="parent"
+                >
                   {{ t("buttons.edit") }}
                 </v-tooltip>
               </v-btn>
-              <v-btn icon elevation="0" @click="onShowDelete(item)">
+              <v-btn
+                icon
+                elevation="0"
+                @click="onShowDelete(item)"
+              >
                 <v-icon>mdi-trash-can</v-icon>
-                <v-tooltip location="bottom" activator="parent">
+                <v-tooltip
+                  location="bottom"
+                  activator="parent"
+                >
                   {{ t("buttons.delete") }}
                 </v-tooltip>
               </v-btn>
@@ -78,19 +95,31 @@
         prepend-icon="mdi-plus"
         @click="() => onShowForm(null)"
       >
-        {{ t("buttons.newSection") }}
+        {{ t("buttons.sectionNew") }}
       </v-btn>
 
-      <v-btn class="pl-3 pr-3" @click="onClose"> Fechar </v-btn>
+      <v-btn
+        class="pl-3 pr-3"
+        @click="onClose"
+      >
+        Fechar
+      </v-btn>
     </div>
   </v-card>
 
-  <v-dialog v-model="dialogs.form" persistent width="620">
-    <v-card class="py-4 px-6" height="650">
+  <v-dialog
+    v-model="dialogs.form"
+    persistent
+    width="620"
+  >
+    <v-card
+      class="py-4 px-6"
+      height="650"
+    >
       <v-card-title class="pb-7">
         {{
-          currentSection.id == null
-            ? t("dialogs.sections.newSection")
+          currentSection.id === null
+            ? t("dialogs.sections.new")
             : t("dialogs.sections.editing", [currentSection.name])
         }}
       </v-card-title>
@@ -98,12 +127,18 @@
       <v-card-text
         class="text-center d-flex flex-column align-space-between justify-center"
       >
-        <v-row align="center" justify="center">
+        <v-row
+          align="center"
+          justify="center"
+        >
           <v-col
             class="text-center flex-column align-center justify-center"
             height="100%"
           >
-            <v-form ref="form" validate-on="submit">
+            <v-form
+              ref="form"
+              validate-on="submit"
+            >
               <v-row>
                 <v-col>
                   <v-text-field
@@ -282,22 +317,32 @@
       </v-card-text>
 
       <div class="d-flex justify-end">
-        <v-btn class="pl-3 pr-3 mr-3" color="primary" @click="onSubmitForm">
+        <v-btn
+          class="pl-3 pr-3 mr-3"
+          color="primary"
+          @click="onSubmitForm"
+        >
           {{ t("buttons.save") }}
         </v-btn>
 
-        <v-btn class="pl-3 pr-3" @click="onDialogClose">
+        <v-btn
+          class="pl-3 pr-3"
+          @click="onDialogClose"
+        >
           {{ t("buttons.cancel") }}
         </v-btn>
       </div>
     </v-card>
   </v-dialog>
 
-  <v-dialog v-model="dialogs.delete" persistent>
+  <v-dialog
+    v-model="dialogs.delete"
+    persistent
+  >
     <v-card class="py-4 px-6">
       <v-card-title>
         {{
-          currentSection.id == null
+          currentSection.id === null
             ? t("errors.ERROR")
             : t("dialogs.sections.deleting", [currentSection.name])
         }}
@@ -309,7 +354,7 @@
 
       <div class="d-flex justify-end">
         <v-btn
-          v-if="currentSection.id != null"
+          v-if="currentSection.id !== null"
           class="pl-3 pr-3 mr-3"
           color="primary"
           @click="onSubmitDelete"
@@ -317,7 +362,10 @@
           {{ t("buttons.delete") }}
         </v-btn>
 
-        <v-btn class="pl-3 pr-3" @click="onDialogClose">
+        <v-btn
+          class="pl-3 pr-3"
+          @click="onDialogClose"
+        >
           {{ t("buttons.cancel") }}
         </v-btn>
       </div>
@@ -326,7 +374,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, defineEmits, computed } from "vue";
+import { computed, defineEmits, reactive, ref } from "vue";
 
 import useGlobalStore from "@/state/global";
 import useMemberStore from "@/state/members";
@@ -391,8 +439,12 @@ const sectionsList = computed(() => {
   result.sort((x, y) => {
     const xName = x.name.toLowerCase();
     const yName = y.name.toLowerCase();
-    if (xName > yName) return 1;
-    if (xName == yName) return 0;
+    if (xName > yName) {
+      return 1;
+    }
+    if (xName == yName) {
+      return 0;
+    }
     return -1;
   });
   return result;
@@ -438,7 +490,7 @@ function onClose(): void {
 
 function onShowForm(section: ISection | null) {
   clearForm();
-  if (section == null) {
+  if (section === null) {
     currentSection.id = null;
     currentSection.name = "";
   } else {
@@ -446,14 +498,14 @@ function onShowForm(section: ISection | null) {
     currentSection.name = section.name;
 
     formSection.name = section.name;
-    formSection.sectionType = section.section_type;
+    formSection.sectionType = section.sectionType;
 
-    switch (section.section_type) {
+    switch (section.sectionType) {
       case SectionType.Generic:
         formSection.genericInertia = String(section.inertia);
         formSection.genericArea = String(section.area);
-        formSection.genericYSup = String(section.y_sup);
-        formSection.genericYInf = String(section.y_inf);
+        formSection.genericYSup = String(section.ySup);
+        formSection.genericYInf = String(section.yInf);
         break;
       case SectionType.Circle:
         formSection.circleD = String(section.params[0]);
@@ -473,13 +525,13 @@ function onShowForm(section: ISection | null) {
 
 function onShowDelete(section: ISection) {
   if (store.sectionsList.length < 2) {
-    store.showAlert("alerts.singleSection");
+    store.appAlert("alerts.singleSection");
     return;
   }
 
   const inUse = members.membersList.some((m) => m.section == section.id);
   if (inUse) {
-    store.showAlert("alerts.sectionInUse");
+    store.appAlert("alerts.sectionInUse");
     return;
   }
 
@@ -491,7 +543,9 @@ function onShowDelete(section: ISection) {
 }
 
 async function onSubmitForm() {
-  if (!form.value) return;
+  if (!form.value) {
+    return;
+  }
 
   const { valid } = await form.value.validate();
 
@@ -499,7 +553,7 @@ async function onSubmitForm() {
     const sameName = sectionsList.value.find((x) => x.name == formSection.name);
 
     if (sameName != undefined && sameName.id != currentSection.id) {
-      store.showAlert(t("alerts.sectionNameInUse"));
+      store.appAlert(t("alerts.sectionNameInUse"));
       return;
     }
 
@@ -523,10 +577,10 @@ async function onSubmitForm() {
         break;
     }
 
-    if (currentSection.id == null) {
-      store.newSection(formSection.name, formSection.sectionType, params);
+    if (currentSection.id === null) {
+      store.sectionNew(formSection.name, formSection.sectionType, params);
     } else {
-      store.updateSection(
+      store.sectionUpdate(
         currentSection.id,
         formSection.name,
         formSection.sectionType,
@@ -540,8 +594,10 @@ async function onSubmitForm() {
 }
 
 function onSubmitDelete() {
-  if (currentSection.id == null) return;
-  store.deleteSection(currentSection.id);
+  if (currentSection.id === null) {
+    return;
+  }
+  store.sectionDelete(currentSection.id);
   onDialogClose();
 }
 

@@ -1,20 +1,32 @@
 use std::collections::HashMap;
 
 use super::{ViewModel, ViewModelError};
-use crate::models::{Material, Member, MemberDTO, Node, Section, UnitType};
+use crate::models::{Member, MemberDTO, UnitType};
 
 impl ViewModel {
-    pub fn member_get(&self, id: usize) -> Result<&Member, ViewModelError> {
-        for member in self.members_list.iter() {
-            if member.id() == id {
-                return Ok(member);
+    pub fn member_delete(&mut self, id: usize, state_save: bool) -> Result<usize, ViewModelError> {
+        let index = self.members_list.iter().position(|x| x.id() == id);
+
+        match index {
+            Some(value) => {
+                if state_save {
+                    let _ = self.state_save();
+                }
+
+                self.members_list.remove(value);
+
+                for (_, case) in self.loadcases_list.iter_mut() {
+                    let _ = case.remove_member(id);
+                }
+
+                Ok(0)
             }
+            None => Err(ViewModelError::InvalidMemberId(id)),
         }
-        Err(ViewModelError::InvalidMemberId(id))
     }
 
-    pub fn member_get_mut(&mut self, id: usize) -> Result<&mut Member, ViewModelError> {
-        for member in self.members_list.iter_mut() {
+    pub fn member_get(&self, id: usize) -> Result<&Member, ViewModelError> {
+        for member in self.members_list.iter() {
             if member.id() == id {
                 return Ok(member);
             }
@@ -89,68 +101,13 @@ impl ViewModel {
         Ok(result)
     }
 
-    pub fn member_get_start(&self, id: usize) -> Result<&Node, ViewModelError> {
-        let member = self.member_get(id);
-        let member = match member {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::InvalidMemberId(id)),
-        };
-
-        let node: Result<&Node, ViewModelError> = self.node_get(member.node_start());
-        match node {
-            Ok(value) => Ok(value),
-            Err(_) => Err(ViewModelError::InvalidNodeId(member.node_start())),
+    pub fn member_get_mut(&mut self, id: usize) -> Result<&mut Member, ViewModelError> {
+        for member in self.members_list.iter_mut() {
+            if member.id() == id {
+                return Ok(member);
+            }
         }
-    }
-
-    pub fn member_get_end(&self, id: usize) -> Result<&Node, ViewModelError> {
-        let member = self.member_get(id);
-        let member = match member {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::InvalidMemberId(id)),
-        };
-
-        let node: Result<&Node, ViewModelError> = self.node_get(member.node_end());
-        match node {
-            Ok(value) => Ok(value),
-            Err(_) => Err(ViewModelError::InvalidNodeId(member.node_start())),
-        }
-    }
-
-    pub fn member_get_material(&self, id: usize) -> Result<&Material, ViewModelError> {
-        let member = self.member_get(id);
-        let member = match member {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::InvalidMemberId(id)),
-        };
-
-        let material = self.materials_list.get(&member.material());
-        match material {
-            Some(value) => Ok(value),
-            None => Err(ViewModelError::InvalidMaterialId(member.material())),
-        }
-    }
-
-    pub fn member_get_section(&self, id: usize) -> Result<&Section, ViewModelError> {
-        let member = self.member_get(id);
-        let member = match member {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::InvalidMemberId(id)),
-        };
-
-        let section = self.sections_list.get(&member.section());
-        match section {
-            Some(value) => Ok(value),
-            None => Err(ViewModelError::InvalidSectionId(member.section())),
-        }
-    }
-
-    pub fn member_get_hinges(&self, id: usize) -> Result<[bool; 2], ViewModelError> {
-        let member = self.member_get(id);
-        match member {
-            Ok(value) => Ok([value.hinge_start(), value.hinge_end()]),
-            Err(_) => Err(ViewModelError::InvalidMemberId(id)),
-        }
+        Err(ViewModelError::InvalidMemberId(id))
     }
 
     pub fn member_new(
@@ -158,7 +115,7 @@ impl ViewModel {
         coords: (f64, f64, f64, f64),
         material_id: usize,
         section_id: usize,
-        save_state: bool,
+        state_save: bool,
     ) -> Result<usize, ViewModelError> {
         let (x0, y0, x1, y1) = coords;
 
@@ -176,8 +133,8 @@ impl ViewModel {
             return Err(ViewModelError::InvalidSectionId(section_id));
         }
 
-        if save_state {
-            let _ = self.save_state();
+        if state_save {
+            let _ = self.state_save();
         }
 
         let start_id = self.node_new(x0, y0, false);
@@ -205,9 +162,9 @@ impl ViewModel {
             }
         }
 
-        let new_member = Member::new(id, start_id, end_id, material_id, section_id).unwrap();
+        let member_new = Member::new(id, start_id, end_id, material_id, section_id).unwrap();
 
-        self.members_list.push(new_member);
+        self.members_list.push(member_new);
 
         for (_, case) in self.loadcases_list.iter_mut() {
             _ = case.add_member(id);
@@ -216,41 +173,20 @@ impl ViewModel {
         Ok(id)
     }
 
-    pub fn member_delete(&mut self, id: usize, save_state: bool) -> Result<usize, ViewModelError> {
-        let index = self.members_list.iter().position(|x| x.id() == id);
-
-        match index {
-            Some(value) => {
-                if save_state {
-                    let _ = self.save_state();
-                }
-
-                self.members_list.remove(value);
-
-                for (_, case) in self.loadcases_list.iter_mut() {
-                    let _ = case.remove_member(id);
-                }
-
-                Ok(0)
-            }
-            None => Err(ViewModelError::InvalidMemberId(id)),
-        }
-    }
-
     pub fn member_set_hinges(
         &mut self,
         id: usize,
         start: bool,
         end: bool,
-        save_state: bool,
+        state_save: bool,
     ) -> Result<usize, ViewModelError> {
         match self.member_get(id) {
             Ok(_) => {}
             Err(_) => return Err(ViewModelError::InvalidMemberId(id)),
         }
 
-        if save_state {
-            let _ = self.save_state();
+        if state_save {
+            let _ = self.state_save();
         }
 
         let member = self.member_get_mut(id).unwrap();
@@ -263,15 +199,15 @@ impl ViewModel {
         &mut self,
         id: usize,
         material_id: usize,
-        save_state: bool,
+        state_save: bool,
     ) -> Result<usize, ViewModelError> {
         match self.member_get(id) {
             Ok(_) => {}
             Err(_) => return Err(ViewModelError::InvalidMemberId(id)),
         }
 
-        if save_state {
-            let _ = self.save_state();
+        if state_save {
+            let _ = self.state_save();
         }
 
         let member = self.member_get_mut(id).unwrap();
@@ -283,15 +219,15 @@ impl ViewModel {
         &mut self,
         id: usize,
         section_id: usize,
-        save_state: bool,
+        state_save: bool,
     ) -> Result<usize, ViewModelError> {
         match self.member_get(id) {
             Ok(_) => {}
             Err(_) => return Err(ViewModelError::InvalidMemberId(id)),
         }
 
-        if save_state {
-            let _ = self.save_state();
+        if state_save {
+            let _ = self.state_save();
         }
 
         let member = self.member_get_mut(id).unwrap();

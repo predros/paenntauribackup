@@ -514,12 +514,12 @@ pub fn linear_analysis(
     }
 
     let (results_comb, reactions_comb) = combination_results(
-        &nodes_list,
-        &members_list,
+        nodes_list,
+        members_list,
         &member_props,
         &results_total,
         &reactions_total,
-        &combinations_list,
+        combinations_list,
     );
 
     Ok(AnalysisResults {

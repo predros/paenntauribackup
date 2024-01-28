@@ -2,11 +2,10 @@ import { defineConfig } from "vite";
 import { fileURLToPath } from "url";
 import vue from "@vitejs/plugin-vue";
 import vuetify from "vite-plugin-vuetify";
-import eslint from "vite-plugin-eslint";
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
-  plugins: [vue(), vuetify(), eslint()],
+  plugins: [vue(), vuetify()],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //

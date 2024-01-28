@@ -10,8 +10,14 @@
       v-if="props.member.qy0 * props.member.qy1 < 0"
       :config="lineConfig.end"
     />
-    <v-text v-if="text.start != null" :config="textConfig.start" />
-    <v-text v-if="text.end != null" :config="textConfig.end" />
+    <v-text
+      v-if="text.start !== null"
+      :config="textConfig.start"
+    />
+    <v-text
+      v-if="text.end !== null"
+      :config="textConfig.end"
+    />
   </v-group>
 </template>
 
@@ -40,9 +46,9 @@ const props = defineProps({
       qy0: 0,
       qx1: 0,
       qy1: 0,
-      is_global: false,
-      t_sup: false,
-      t_inf: false,
+      isGLobal: false,
+      tSup: false,
+      tInf: false,
     }),
   },
   scale: {
@@ -81,11 +87,13 @@ const text = computed(() => {
   let start: string | null = null;
   let end: string | null = null;
 
-  if (props.member.qy0 != 0)
+  if (props.member.qy0 != 0) {
     start = settings.formatUnit(Math.abs(props.member.qy0), UnitType.Load);
+  }
 
-  if (props.member.qy1 != 0 && props.member.qy1 != props.member.qy0)
+  if (props.member.qy1 != 0 && props.member.qy1 != props.member.qy0) {
     end = settings.formatUnit(Math.abs(props.member.qy1), UnitType.Load);
+  }
 
   return { start, end };
 });
@@ -99,14 +107,12 @@ const numArrows = computed(() => {
   return result;
 });
 
-const groupConfig = computed(() => {
-  return {
-    x: props.member.x0,
-    y: -props.member.y0,
-    rotation: -props.member.angle,
-    listening: false,
-  };
-});
+const groupConfig = computed(() => ({
+  x: props.member.x0,
+  y: -props.member.y0,
+  rotation: -props.member.angle,
+  listening: false,
+}));
 
 const textConfig = computed(() => {
   const textScale =
@@ -117,8 +123,8 @@ const textConfig = computed(() => {
   let textStart = {};
   let textEnd = {};
 
-  if (text.value.start != null) {
-    if (text.value.end == null) {
+  if (text.value.start !== null) {
+    if (text.value.end === null) {
       textStart = {
         x: props.member.length / 2,
         y:
@@ -156,7 +162,7 @@ const textConfig = computed(() => {
       };
     }
 
-    if (text.value.end != null) {
+    if (text.value.end !== null) {
       textEnd = {
         x: props.member.length / 2,
         y: (heights.value.end + Math.sign(props.member.qy1) * 30) / props.scale,

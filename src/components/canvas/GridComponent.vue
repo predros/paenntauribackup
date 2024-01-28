@@ -22,7 +22,9 @@ import { IRectangle } from "@/helper/math";
 const store = useGlobalStore();
 const settings = useSettings();
 
-const viewPortBounds = computed<IRectangle>(() => store.canvasProps.viewPortBounds);
+const viewPortBounds = computed<IRectangle>(
+  () => store.canvasProps.viewPortBounds,
+);
 const spacing = computed(() => settings.gridSpacing);
 
 const numberLines = computed(() => {

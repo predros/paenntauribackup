@@ -4,6 +4,13 @@ use itertools::Itertools;
 use std::collections::HashMap;
 
 impl ViewModel {
+    pub fn combination_delete(&mut self, id: usize) -> Result<usize, ViewModelError> {
+        match self.combinations_list.remove(&id) {
+            Some(_) => Ok(0),
+            None => Err(ViewModelError::InvalidCombinationId(id)),
+        }
+    }
+
     pub fn combination_get_dtos(&self) -> Vec<CombinationDTO> {
         let mut result: Vec<CombinationDTO> = vec![];
 
@@ -11,9 +18,22 @@ impl ViewModel {
             result.push(CombinationDTO {
                 id: *id,
                 name: combination.name(),
+                load_factors: combination.get_all_factors(),
             });
         }
         result
+    }
+
+    pub fn combination_get_factors(
+        &self,
+        id: usize,
+    ) -> Result<HashMap<usize, f64>, ViewModelError> {
+        let combination = match self.combinations_list.get(&id) {
+            Some(value) => value,
+            None => return Err(ViewModelError::InvalidCombinationId(id)),
+        };
+
+        Ok(combination.get_all_factors())
     }
 
     pub fn combination_new(&mut self, name: String) -> Result<usize, ViewModelError> {
@@ -42,43 +62,6 @@ impl ViewModel {
         self.combinations_list.insert(id, combination);
 
         Ok(id)
-    }
-
-    pub fn combination_update(
-        &mut self,
-        id: usize,
-        new_name: String,
-    ) -> Result<usize, ViewModelError> {
-        if new_name.trim().is_empty() {
-            return Err(ViewModelError::EmptyName);
-        }
-
-        for (_, case) in self.combinations_list.iter() {
-            if case.name() == new_name {
-                return Err(ViewModelError::NameInUse);
-            }
-        }
-
-        let combination = match self.combinations_list.get_mut(&id) {
-            Some(value) => value,
-            None => return Err(ViewModelError::InvalidCombinationId(id)),
-        };
-
-        let _ = combination.set_name(&new_name);
-
-        Ok(0)
-    }
-
-    pub fn combination_get_factors(
-        &self,
-        id: usize,
-    ) -> Result<HashMap<usize, f64>, ViewModelError> {
-        let combination = match self.combinations_list.get(&id) {
-            Some(value) => value,
-            None => return Err(ViewModelError::InvalidCombinationId(id)),
-        };
-
-        Ok(combination.get_all_factors())
     }
 
     pub fn combination_set_factors(
@@ -113,5 +96,30 @@ impl ViewModel {
             Ok(_) => Ok(0),
             Err(_) => Err(ViewModelError::InvalidLoadcaseId(loadcase_id)),
         }
+    }
+
+    pub fn combination_update(
+        &mut self,
+        id: usize,
+        new_name: String,
+    ) -> Result<usize, ViewModelError> {
+        if new_name.trim().is_empty() {
+            return Err(ViewModelError::EmptyName);
+        }
+
+        for (_, case) in self.combinations_list.iter() {
+            if case.name() == new_name {
+                return Err(ViewModelError::NameInUse);
+            }
+        }
+
+        let combination = match self.combinations_list.get_mut(&id) {
+            Some(value) => value,
+            None => return Err(ViewModelError::InvalidCombinationId(id)),
+        };
+
+        combination.set_name(&new_name);
+
+        Ok(0)
     }
 }

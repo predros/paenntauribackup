@@ -28,17 +28,27 @@
       </v-row>
 
       <v-row class="pt-10 px-2">
-        <v-btn block color="primary" @click="onSubmit">
+        <v-btn
+          block
+          color="primary"
+          @click="onSubmit"
+        >
           {{ t("buttons.applyToSelection") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onReset">
+        <v-btn
+          block
+          @click="onReset"
+        >
           {{ t("buttons.clear") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onClose">
+        <v-btn
+          block
+          @click="onClose"
+        >
           {{ t("buttons.close") }}
         </v-btn>
       </v-row>
@@ -68,7 +78,7 @@ function onReset(): void {
 }
 
 function onSubmit(): void {
-  store.applyHinges(hinges.nodes, hinges.memberStart, hinges.memberEnd);
+  store.selectedApplyHinges(hinges.nodes, hinges.memberStart, hinges.memberEnd);
 }
 
 function onClose(): void {

@@ -1,10 +1,18 @@
 <template>
   <v-app class="app">
-    <v-app-bar density="compact" :height="50" elevation="2">
+    <v-app-bar
+      density="compact"
+      :height="50"
+      elevation="2"
+    >
       <MenuComponent />
     </v-app-bar>
 
-    <div class="home-view" tabindex="0" @keydown="onKeyDown">
+    <div
+      class="home-view"
+      tabindex="0"
+      @keydown="onKeyDown"
+    >
       <v-navigation-drawer
         v-model="sideBarShow"
         location="right"
@@ -16,7 +24,10 @@
         <SideBarBase />
       </v-navigation-drawer>
 
-      <div ref="upperRow" class="upper-row">
+      <div
+        ref="upperRow"
+        class="upper-row"
+      >
         <ToolbarTop />
       </div>
 
@@ -24,7 +35,10 @@
         <div class="middle-left-cell">
           <ToolbarSide />
         </div>
-        <div ref="divCanvas" class="middle-right-cell">
+        <div
+          ref="divCanvas"
+          class="middle-right-cell"
+        >
           <MainCanvas
             ref="cnv"
             :width="canvasWidth"
@@ -45,10 +59,16 @@
           density="comfortable"
           rounded="0"
         >
-          <v-btn icon :value="true">
+          <v-btn
+            icon
+            :value="true"
+          >
             <v-icon v-if="store.canvasProps.showGrid"> mdi-grid </v-icon>
             <v-icon v-else> mdi-grid-off </v-icon>
-            <v-tooltip activator="parent" location="top">
+            <v-tooltip
+              activator="parent"
+              location="top"
+            >
               {{ t("app.showGrid") }}
             </v-tooltip>
           </v-btn>
@@ -60,9 +80,16 @@
           density="comfortable"
           rounded="0"
         >
-          <v-btn icon :value="true" :disabled="!store.canvasProps.showGrid">
+          <v-btn
+            icon
+            :value="true"
+            :disabled="!store.canvasProps.showGrid"
+          >
             <v-icon> mdi-dots-grid </v-icon>
-            <v-tooltip activator="parent" location="top">
+            <v-tooltip
+              activator="parent"
+              location="top"
+            >
               {{ t("app.snapToGrid") }}
             </v-tooltip>
           </v-btn>
@@ -76,7 +103,10 @@
           @click="onZoomIn"
         >
           <v-icon> mdi-magnify-plus </v-icon>
-          <v-tooltip activator="parent" location="top">
+          <v-tooltip
+            activator="parent"
+            location="top"
+          >
             {{ t("app.zoomIn") }}
           </v-tooltip>
         </v-btn>
@@ -89,7 +119,10 @@
           @click="onZoomOut"
         >
           <v-icon> mdi-magnify-minus </v-icon>
-          <v-tooltip activator="parent" location="top">
+          <v-tooltip
+            activator="parent"
+            location="top"
+          >
             {{ t("app.zoomOut") }}
           </v-tooltip>
         </v-btn>
@@ -107,14 +140,18 @@
       </v-dialog>
 
       <v-dialog
-        v-model="store.showDialog.loadcases"
+        v-model="store.dialogs.loadcases"
         persistent
         max-width="500"
       >
         <DialogLoadcases />
       </v-dialog>
 
-      <v-dialog v-model="store.showDialog.runningAnalysis" persistent width="250">
+      <v-dialog
+        v-model="store.dialogs.runningAnalysis"
+        persistent
+        width="250"
+      >
         <v-card>
           <template #loader>
             <v-progress-linear
@@ -129,10 +166,11 @@
       </v-dialog>
     </div>
 
-
-
-    <v-snackbar v-model="store.showDialog.alert.show" :timeout="4000">
-      {{ store.showDialog.alert.text }}
+    <v-snackbar
+      v-model="store.dialogs.alert.show"
+      :timeout="4000"
+    >
+      {{ store.dialogs.alert.text }}
     </v-snackbar>
   </v-app>
 </template>
@@ -140,7 +178,7 @@
 <script setup lang="ts">
 //#region Imports
 import { appWindow } from "@tauri-apps/api/window";
-import { ref, onMounted, computed } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { VAppBar } from "vuetify/components";
 import { invoke } from "@tauri-apps/api";
 import { useI18n } from "vue-i18n";
@@ -148,12 +186,12 @@ import { useI18n } from "vue-i18n";
 import { ClickType, SideBarType } from "@/types/types";
 
 import {
-  doesLineIntersectRect,
-  isPointInRect,
-  isLineInRect,
-  projectOntoVector,
-  IRectangle,
   IPoint,
+  IRectangle,
+  doesLineIntersectRect,
+  isLineInRect,
+  isPointInRect,
+  projectOntoVector,
 } from "@/helper/math";
 
 import useGlobalStore from "@/state/global";
@@ -194,11 +232,11 @@ onMounted(async () => {
   await onResize();
   window.addEventListener("resize", onResize);
 
-  await store.newFile();
+  await store.fileNew();
 
   await store.fetchEverything();
 
-  invoke("close_splashscreen");
+  invoke("app_splashcreen_close");
 });
 //#endregion
 
@@ -208,7 +246,9 @@ const sideBarShow = computed<boolean>(
 );
 
 const mousePositionText = computed(() => {
-  if (store.canvasProps.mousePosition == null) return "";
+  if (store.canvasProps.mousePosition === null) {
+    return "";
+  }
 
   const textX = settings.formatUnit(
     store.canvasProps.mousePosition.x,
@@ -227,11 +267,17 @@ const mousePositionText = computed(() => {
 
 //#region Functions
 function snapToGrid(x: number, y: number) {
-  if (!cnv.value) return null;
-  if (!divCanvas.value) return null;
+  if (!cnv.value) {
+    return null;
+  }
+  if (!divCanvas.value) {
+    return null;
+  }
 
   const stage = cnv.value.getStage();
-  if (!stage) return null;
+  if (!stage) {
+    return null;
+  }
 
   const canvasPosition = divCanvas.value.getBoundingClientRect();
 
@@ -251,7 +297,9 @@ function snapToGrid(x: number, y: number) {
 
 //#region Event handlers
 async function onResize(): Promise<void> {
-  if (!upperRow.value) return;
+  if (!upperRow.value) {
+    return;
+  }
 
   const size = await appWindow.innerSize();
   const viewHeight = size.height;
@@ -266,55 +314,51 @@ async function onKeyDown(event: KeyboardEvent): Promise<void> {
   if (event.ctrlKey && !event.shiftKey && !event.altKey) {
     switch (event.key.toLowerCase()) {
       case "n":
-        await store.newFile();
+        await store.fileNew();
         break;
       case "o":
-        await store.openFile();
+        await store.fileOpen();
         break;
       case "s":
-        await store.saveFile();
+        await store.fileSave();
         break;
       case "w":
-        await store.exitApp();
+        await store.appExit();
         break;
       case "y":
-        if (store.current.sideBarType != SideBarType.Result) await store.redo();
+        if (store.current.sideBarType != SideBarType.Result) {
+          await store.appRedo();
+        }
         break;
       case "z":
-        if (store.current.sideBarType != SideBarType.Result) await store.undo();
+        if (store.current.sideBarType != SideBarType.Result) {
+          await store.appUndo();
+        }
         break;
     }
   } else if (event.ctrlKey && event.shiftKey && !event.altKey) {
     switch (event.key.toLowerCase()) {
       case "s":
-        await store.saveFileAs();
+        await store.fileSaveAs();
         break;
     }
   } else if (!event.ctrlKey && !event.shiftKey && !event.altKey) {
     switch (event.key.toLowerCase()) {
       case "delete":
-        await store.deleteSelected();
+        await store.selectedDelete();
         break;
     }
   }
 }
 
 async function onCanvasMouseDown(x: number, y: number): Promise<void> {
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
 
   switch (store.current.clickType) {
     case ClickType.Select:
       mouseAnchor.value = { x, y };
-      break;
-    case ClickType.NewNode:
-      if (store.canvasProps.gridSnap) {
-        const snap = snapToGrid(x, y);
-        if (snap == null) return;
-        await nodes.newNode(snap.coords.x, -snap.coords.y, false);
-        store.snapCursorTo(snap.window);
-      } else {
-        await nodes.newNode(x, -y, false);
-      }
       break;
     default:
       break;
@@ -327,12 +371,15 @@ async function onCanvasMouseUp(
   xAnchor: number | undefined,
   yAnchor: number | undefined,
 ): Promise<void> {
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
 
   switch (store.current.clickType) {
     case ClickType.Select:
-      if (xAnchor == undefined || yAnchor == undefined) store.select([], []);
-      else {
+      if (xAnchor == undefined || yAnchor == undefined) {
+        store.select([], []);
+      } else {
         const width = x - xAnchor;
         const height = y - yAnchor;
         const rect: IRectangle = { x: xAnchor, y: yAnchor, width, height };
@@ -341,8 +388,9 @@ async function onCanvasMouseUp(
         const selectedMembers: number[] = [];
 
         nodes.nodesList.forEach((node) => {
-          if (isPointInRect({ x: node.x, y: -node.y }, rect))
+          if (isPointInRect({ x: node.x, y: -node.y }, rect)) {
             selectedNodes.push(node.id);
+          }
         });
 
         if (width > 0) {
@@ -355,8 +403,9 @@ async function onCanvasMouseUp(
                 },
                 rect,
               )
-            )
+            ) {
               selectedMembers.push(member.id);
+            }
           });
         } else {
           members.membersList.forEach((member) => {
@@ -368,21 +417,38 @@ async function onCanvasMouseUp(
                 },
                 rect,
               )
-            )
+            ) {
               selectedMembers.push(member.id);
+            }
           });
         }
         store.select(selectedNodes, selectedMembers);
       }
       break;
+    case ClickType.NewNode:
+      if (store.canvasProps.gridSnap) {
+        const snap = snapToGrid(x, y);
+        if (snap === null) {
+          return;
+        }
+        await nodes.newNode(snap.coords.x, -snap.coords.y, false);
+        store.appCursorSnap(snap.window);
+      } else {
+        await nodes.newNode(x, -y, false);
+      }
+      break;
     case ClickType.NewMemberStart:
-      if (xAnchor == undefined || yAnchor == undefined) return;
+      if (xAnchor == undefined || yAnchor == undefined) {
+        return;
+      }
       if (store.canvasProps.gridSnap) {
         const snap = snapToGrid(xAnchor, yAnchor);
-        if (snap == null) return;
+        if (snap === null) {
+          return;
+        }
 
         store.canvasProps.newMemberAnchor = snap.coords;
-        store.snapCursorTo(snap.window);
+        store.appCursorSnap(snap.window);
         store.current.clickType = ClickType.NewMemberEnd;
       } else {
         store.canvasProps.newMemberAnchor = { x: xAnchor, y: yAnchor };
@@ -390,19 +456,23 @@ async function onCanvasMouseUp(
       }
       break;
     case ClickType.NewMemberEnd:
-      if (store.canvasProps.newMemberAnchor == null) return;
-
-      if (store.current.material == null) {
-        store.showAlert(t("alerts.noMaterialSelected"));
+      if (store.canvasProps.newMemberAnchor === null) {
         return;
-      } else if (store.current.section == null) {
-        store.showAlert(t("alerts.noSectionSelected"));
+      }
+
+      if (store.current.material === null) {
+        store.appAlert(t("alerts.noMaterialSelected"));
+        return;
+      } else if (store.current.section === null) {
+        store.appAlert(t("alerts.noSectionSelected"));
         return;
       }
 
       if (store.canvasProps.gridSnap) {
         const snap = snapToGrid(x, y);
-        if (snap == null) return;
+        if (snap === null) {
+          return;
+        }
 
         await members.newMember(
           store.canvasProps.newMemberAnchor.x,
@@ -413,7 +483,7 @@ async function onCanvasMouseUp(
           store.current.section,
           false,
         );
-        store.snapCursorTo(snap.window);
+        store.appCursorSnap(snap.window);
       } else {
         await members.newMember(
           store.canvasProps.newMemberAnchor.x,
@@ -434,12 +504,16 @@ async function onCanvasMouseUp(
 }
 
 function onZoomIn(): void {
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
   cnv.value.zoom(1.1, false);
 }
 
 function onZoomOut(): void {
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
   cnv.value.zoom(1 / 1.1, false);
 }
 
@@ -447,27 +521,33 @@ async function onNodeClicked(id: number): Promise<void> {
   const node = nodes.getNode(id);
   switch (store.current.clickType) {
     case ClickType.NewNode:
-      store.showAlert(t("alerts.nodeAlreadyExists", [id]));
+      store.appAlert(t("alerts.nodeAlreadyExists", [id]));
       break;
     case ClickType.Select:
       store.select([id], []);
       break;
     case ClickType.NewMemberStart:
-      if (node == undefined) return;
+      if (node == undefined) {
+        return;
+      }
       store.canvasProps.newMemberAnchor = { x: node.x, y: -node.y };
       store.current.clickType = ClickType.NewMemberEnd;
       break;
     case ClickType.NewMemberEnd:
-      if (node == undefined) return;
-      if (store.current.material == null) {
-        store.showAlert(t("alerts.noMaterialSelected"));
+      if (node == undefined) {
         return;
-      } else if (store.current.section == null) {
-        store.showAlert(t("alerts.noSectionSelected"));
+      }
+      if (store.current.material === null) {
+        store.appAlert(t("alerts.noMaterialSelected"));
+        return;
+      } else if (store.current.section === null) {
+        store.appAlert(t("alerts.noSectionSelected"));
         return;
       }
 
-      if (store.canvasProps.newMemberAnchor == null) return;
+      if (store.canvasProps.newMemberAnchor === null) {
+        return;
+      }
 
       await members.newMember(
         store.canvasProps.newMemberAnchor.x,
@@ -497,13 +577,17 @@ async function onMemberClicked(
     case ClickType.NewNode:
       if (store.canvasProps.gridSnap) {
         const snap = snapToGrid(mouseX, mouseY);
-        if (snap == null) return;
+        if (snap === null) {
+          return;
+        }
 
         await nodes.newNode(snap.coords.x, -snap.coords.y, false);
-        store.snapCursorTo(snap.window);
+        store.appCursorSnap(snap.window);
       } else {
         const member = members.membersList.find((x) => x.id == id);
-        if (!member) return;
+        if (!member) {
+          return;
+        }
 
         const memberVector = {
           x: member.x1 - member.x0,
@@ -514,7 +598,9 @@ async function onMemberClicked(
           y: -mouseY - member.y0,
         };
         const projected = projectOntoVector(memberVector, mouseVector);
-        if (projected == null) return;
+        if (projected === null) {
+          return;
+        }
 
         await nodes.newNode(
           member.x0 + projected.x,
@@ -526,7 +612,9 @@ async function onMemberClicked(
     case ClickType.Result:
       {
         const member = members.membersList.find((x) => x.id == id);
-        if (!member) return;
+        if (!member) {
+          return;
+        }
 
         const memberVector = {
           x: member.x1 - member.x0,
@@ -537,7 +625,9 @@ async function onMemberClicked(
           y: -mouseY - member.y0,
         };
         const projected = projectOntoVector(memberVector, mouseVector);
-        if (projected == null) return;
+        if (projected === null) {
+          return;
+        }
 
         const angle = (member.angle * Math.PI) / 180;
         const cos = Math.cos(angle);

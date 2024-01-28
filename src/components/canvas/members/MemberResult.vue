@@ -2,27 +2,54 @@
   <v-group :config="groupConfig">
     <v-line :config="lineConfig" />
 
-    <v-line v-if="text.start != null" :config="endLinesConfig.start" />
-    <v-line v-if="text.end != null" :config="endLinesConfig.end" />
-
-    <v-line v-if="text.critFirst != null" :config="endLinesConfig.critFirst" />
     <v-line
-      v-if="text.critSecond != null"
+      v-if="text.start !== null"
+      :config="endLinesConfig.start"
+    />
+    <v-line
+      v-if="text.end !== null"
+      :config="endLinesConfig.end"
+    />
+
+    <v-line
+      v-if="text.critFirst !== null"
+      :config="endLinesConfig.critFirst"
+    />
+    <v-line
+      v-if="text.critSecond !== null"
       :config="endLinesConfig.critSecond"
     />
 
-    <v-text v-if="text.start != null" :config="textConfig.start" />
-    <v-text v-if="text.end != null" :config="textConfig.end" />
-    <v-text v-if="text.critFirst != null" :config="textConfig.critFirst" />
-    <v-text v-if="text.critSecond != null" :config="textConfig.critSecond" />
+    <v-text
+      v-if="text.start !== null"
+      :config="textConfig.start"
+    />
+    <v-text
+      v-if="text.end !== null"
+      :config="textConfig.end"
+    />
+    <v-text
+      v-if="text.critFirst !== null"
+      :config="textConfig.critFirst"
+    />
+    <v-text
+      v-if="text.critSecond !== null"
+      :config="textConfig.critSecond"
+    />
 
-    <v-line v-if="props.selected" :config="selectedLineConfig" />
-    <v-text v-if="text.selected != null" :config="textConfig.selected" />
+    <v-line
+      v-if="props.selected"
+      :config="selectedLineConfig"
+    />
+    <v-text
+      v-if="text.selected !== null"
+      :config="textConfig.selected"
+    />
   </v-group>
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, PropType } from "vue";
+import { PropType, computed, defineProps } from "vue";
 import { IMember, IMemberResult, ResultType } from "@/types/types";
 import useSettings from "@/state/settings";
 import { UnitType } from "@/types/units";
@@ -46,8 +73,8 @@ const props = defineProps({
       qy0: 0,
       qx1: 0,
       qy1: 0,
-      t_sup: 0,
-      t_inf: 0,
+      tSup: 0,
+      tInf: 0,
     }),
   },
   result: {
@@ -60,9 +87,9 @@ const props = defineProps({
       normal: [],
       shear: [],
       moment: [],
-      max_moment: [],
-      min_moment: [],
-      vert_shear: [],
+      maxMoment: [],
+      minMoment: [],
+      vertShear: [],
     }),
   },
   scale: {
@@ -104,22 +131,23 @@ const text = computed(() => {
   let end: number | undefined;
 
   const result = {
-    start: null as null | string,
     end: null as null | string,
     critFirst: null as null | string,
     critSecond: null as null | string,
     selected: null as null | string,
+    start: null as null | string,
   };
 
   switch (props.resultType) {
     case ResultType.Displacement:
       break;
     case ResultType.Moment:
-      console.log(props.result.max_moment || 0, props.result.min_moment || 0);
-      (start = props.result.moment.at(0)), UnitType.Moment;
+      start = props.result.moment.at(0);
       end = props.result.moment.at(-1);
 
-      if (start == undefined || end == undefined) return result;
+      if (start == undefined || end == undefined) {
+        return result;
+      }
 
       result.start = floatEq(start, 0)
         ? null
@@ -128,17 +156,17 @@ const text = computed(() => {
         ? null
         : settings.formatUnit(Math.abs(end), UnitType.Moment, false);
 
-      if (props.result.min_moment[0] > 0) {
+      if (props.result.minMoment[0] > 0) {
         result.critFirst = settings.formatUnit(
-          Math.abs(props.result.min_moment[1]),
+          Math.abs(props.result.minMoment[1]),
           UnitType.Moment,
           false,
         );
       }
 
-      if (props.result.max_moment[0] > 0) {
+      if (props.result.maxMoment[0] > 0) {
         result.critSecond = settings.formatUnit(
-          Math.abs(props.result.max_moment[1]),
+          Math.abs(props.result.maxMoment[1]),
           UnitType.Moment,
           false,
         );
@@ -149,7 +177,9 @@ const text = computed(() => {
       start = props.result.normal.at(0);
       end = props.result.normal.at(-1);
 
-      if (start == undefined || end == undefined) return result;
+      if (start == undefined || end == undefined) {
+        return result;
+      }
 
       result.start = floatEq(start, 0)
         ? null
@@ -158,9 +188,9 @@ const text = computed(() => {
         ? null
         : settings.formatUnit(end, UnitType.Force, false);
 
-      if (props.result.vert_normal[0] > 0) {
+      if (props.result.vertNormal[0] > 0) {
         result.critFirst = settings.formatUnit(
-          props.result.vert_normal[1],
+          props.result.vertNormal[1],
           UnitType.Force,
           false,
         );
@@ -170,7 +200,9 @@ const text = computed(() => {
       start = props.result.shear.at(0);
       end = props.result.shear.at(-1);
 
-      if (start == undefined || end == undefined) return result;
+      if (start == undefined || end == undefined) {
+        return result;
+      }
 
       result.start = floatEq(start, 0)
         ? null
@@ -179,9 +211,9 @@ const text = computed(() => {
         ? null
         : settings.formatUnit(end, UnitType.Force, false);
 
-      if (props.result.vert_shear[0] > 0) {
+      if (props.result.vertShear[0] > 0) {
         result.critFirst = settings.formatUnit(
-          props.result.vert_shear[1],
+          props.result.vertShear[1],
           UnitType.Force,
           false,
         );
@@ -189,7 +221,7 @@ const text = computed(() => {
       break;
   }
 
-  if (selectedProperties.value != null) {
+  if (selectedProperties.value !== null) {
     const { index } = selectedProperties.value;
 
     switch (props.resultType) {
@@ -203,7 +235,7 @@ const text = computed(() => {
           const formatDy = settings.formatUnit(dy, UnitType.Displacement, true);
           const formatRz = settings.formatUnit(rz, UnitType.Rotation, true);
 
-          result.selected = `(${formatDx}; ${formatDy}; ${formatRz})`;
+          result.selected = `x: ${formatDx}\ny: ${formatDy}\nz: ${formatRz})`;
         }
         break;
       case ResultType.Moment:
@@ -261,14 +293,14 @@ const generalProperties = computed(() => {
       result.invert = -1;
       result.scale = (100 * props.resultScale) / props.extrema.moment;
 
-      if (text.value.critFirst != null) {
-        result.critFirst.x = props.result.min_moment[0];
-        result.critFirst.y = props.result.min_moment[1];
+      if (text.value.critFirst !== null) {
+        result.critFirst.x = props.result.minMoment[0];
+        result.critFirst.y = props.result.minMoment[1];
       }
 
-      if (text.value.critSecond != null) {
-        result.critSecond.x = props.result.max_moment[0];
-        result.critSecond.y = props.result.max_moment[1];
+      if (text.value.critSecond !== null) {
+        result.critSecond.x = props.result.maxMoment[0];
+        result.critSecond.y = props.result.maxMoment[1];
       }
       break;
     case ResultType.Normal:
@@ -283,9 +315,9 @@ const generalProperties = computed(() => {
       result.scale = (100 * props.resultScale) / props.extrema.shear;
       result.color = "red";
 
-      if (text.value.critFirst != null) {
-        result.critFirst.x = props.result.vert_shear[0];
-        result.critFirst.y = props.result.vert_shear[1];
+      if (text.value.critFirst !== null) {
+        result.critFirst.x = props.result.vertShear[0];
+        result.critFirst.y = props.result.vertShear[1];
       }
       break;
   }
@@ -294,7 +326,9 @@ const generalProperties = computed(() => {
 });
 
 const selectedProperties = computed(() => {
-  if (!props.selected) return null;
+  if (!props.selected) {
+    return null;
+  }
 
   const numPoints = props.result.dx.length;
   const step = props.member.length / (numPoints - 1);
@@ -328,14 +362,12 @@ const selectedProperties = computed(() => {
   };
 });
 
-const groupConfig = computed(() => {
-  return {
-    x: props.member.x0,
-    y: -props.member.y0,
-    rotation: -props.member.angle,
-    listening: false,
-  };
-});
+const groupConfig = computed(() => ({
+  x: props.member.x0,
+  y: -props.member.y0,
+  rotation: -props.member.angle,
+  listening: false,
+}));
 
 const lineConfig = computed(() => {
   let listY: number[];
@@ -365,8 +397,8 @@ const lineConfig = computed(() => {
   let x = 0;
   if (props.resultType == ResultType.Displacement) {
     listY.forEach((value, index) => {
-      const value_x = listX[index];
-      points.push(x + scale * value_x);
+      const valueX = listX[index];
+      points.push(x + scale * valueX);
       points.push(-scale * value);
 
       x += step;
@@ -399,8 +431,10 @@ const endLinesConfig = computed(() => {
   const { start, end, invert, color, critFirst, critSecond, scale } =
     generalProperties.value;
 
-  if (start == undefined) return result;
-  if (text.value.start != null) {
+  if (start == undefined) {
+    return result;
+  }
+  if (text.value.start !== null) {
     const height = scale * invert * start;
     result.start = {
       x: 0,
@@ -411,8 +445,10 @@ const endLinesConfig = computed(() => {
     };
   }
 
-  if (end == undefined) return result;
-  if (text.value.end != null) {
+  if (end == undefined) {
+    return result;
+  }
+  if (text.value.end !== null) {
     const height = scale * invert * end;
 
     result.end = {
@@ -452,7 +488,9 @@ const endLinesConfig = computed(() => {
 });
 
 const selectedLineConfig = computed(() => {
-  if (!selectedProperties.value) return {};
+  if (!selectedProperties.value) {
+    return {};
+  }
 
   const { invert, scale } = generalProperties.value;
   let { height, length } = selectedProperties.value;
@@ -482,7 +520,7 @@ const textConfig = computed(() => {
   const { start, end, invert, color, critFirst, critSecond, scale } =
     generalProperties.value;
 
-  if (text.value.selected != null && selectedProperties.value != null) {
+  if (text.value.selected !== null && selectedProperties.value !== null) {
     const textScale =
       (props.member.angle >= 0 && props.member.angle < 90) ||
       (props.member.angle >= 270 && props.member.angle < 360)
@@ -499,9 +537,9 @@ const textConfig = computed(() => {
       x: x + length,
       y: -height - (Math.sign(height) * 10) / props.scale,
       offsetX: (props.member.length * props.scale) / 2,
-      offsetY: 6,
+      offsetY: 20,
       width: props.member.length * props.scale,
-      height: 12,
+      height: 40,
       align: "center",
       verticalAlign: "center",
       text: text.value.selected,
@@ -510,12 +548,12 @@ const textConfig = computed(() => {
       scaleX: textScale / props.scale,
       scaleY: textScale / props.scale,
     };
-
-    console.log(result.selected);
   }
 
-  if (start == undefined) return result;
-  if (text.value.start != null) {
+  if (start == undefined) {
+    return result;
+  }
+  if (text.value.start !== null) {
     const height = scale * invert * start;
 
     result.start = {
@@ -535,8 +573,10 @@ const textConfig = computed(() => {
     };
   }
 
-  if (end == undefined) return result;
-  if (text.value.end != null) {
+  if (end == undefined) {
+    return result;
+  }
+  if (text.value.end !== null) {
     const height = scale * invert * end;
 
     result.end = {

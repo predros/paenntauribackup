@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import { INode } from "@/types/types";
+import { computed, ref } from "vue";
+import { type INode } from "@/types/types";
 import { invoke } from "@tauri-apps/api/tauri";
 import useMemberStore from "@/state/members";
 import useGlobalStore from "@/state/global";
@@ -18,9 +18,9 @@ export default defineStore("nodes", () => {
   const nodesList = ref<INode[]>([]);
 
   async function fetchNodes(): Promise<void> {
-    const result = await invoke("get_node_dtos").catch((e: string[]) =>
-      store.showAlert(t(e[0], [e[1]])),
-    );
+    const result = await invoke("node_get_dtos").catch((e: string[]) => {
+      store.appAlert(t(e[0], [e[1]]));
+    });
 
     nodesList.value = result as INode[];
   }
@@ -36,8 +36,10 @@ export default defineStore("nodes", () => {
       realY = y;
     }
 
-    const result = await invoke("new_node", { x: realX, y: realY }).catch(
-      (e: string[]) => store.showAlert(t(e[0], [e[1]])),
+    const result = await invoke("node_new", { x: realX, y: realY }).catch(
+      (e: string[]) => {
+        store.appAlert(t(e[0], [e[1]]));
+      },
     );
 
     const [undoLen, redoLen] = result as [number, number];
@@ -55,20 +57,26 @@ export default defineStore("nodes", () => {
   ): Promise<void> {
     const ids = store.current.selected.nodes;
 
-    if (ids.length == 0) return;
+    if (ids.length == 0) {
+      return;
+    }
 
     const fullRotation =
       settings.getUnitName(UnitType.Angle) == "rad" ? 2 * Math.PI : 360;
 
     let angleCorrected = supports.angle % fullRotation;
-    if (angleCorrected < 0) angleCorrected += fullRotation;
+    if (angleCorrected < 0) {
+      angleCorrected += fullRotation;
+    }
 
-    const result = await invoke("apply_supports", {
+    const result = await invoke("selected_apply_supports", {
       ids,
       supports: [supports.x, supports.y, supports.z, angleCorrected],
       springs: [springs.x, springs.y, springs.z],
       displacements: [displacements.x, displacements.y, displacements.z],
-    }).catch((e: string[]) => store.showAlert(t(e[0], [e[1]])));
+    }).catch((e: string[]) => {
+      store.appAlert(t(e[0], [e[1]]));
+    });
 
     const [undoLen, redoLen] = result as [number, number];
     store.historyLength.undo = undoLen;
@@ -85,18 +93,24 @@ export default defineStore("nodes", () => {
   ): Promise<void> {
     const ids = store.current.selected.nodes;
 
-    if (ids.length == 0) return;
+    if (ids.length == 0) {
+      return;
+    }
 
     let angleCorrected = angle % 360;
-    if (angleCorrected < 0) angleCorrected += 360;
+    if (angleCorrected < 0) {
+      angleCorrected += 360;
+    }
 
-    const result = await invoke("apply_nodal_forces", {
+    const result = await invoke("selected_apply_nodal_forces", {
       ids,
       fx,
       fy,
       mz,
       angle: angleCorrected,
-    }).catch((e: string[]) => store.showAlert(t(e[0], [e[1]])));
+    }).catch((e: string[]) => {
+      store.appAlert(t(e[0], [e[1]]));
+    });
 
     const [undoLen, redoLen] = result as [number, number];
     store.historyLength.undo = undoLen;

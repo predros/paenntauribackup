@@ -1,32 +1,29 @@
 <template>
   <div>
-    <v-btn id="menu-file" class="text-none">
+    <v-btn
+      id="menu-file"
+      class="text-none"
+    >
       {{ t("menu.file.self") }}
     </v-btn>
 
-    <v-btn id="menu-edit" class="text-none">
+    <v-btn
+      id="menu-edit"
+      class="text-none"
+    >
       {{ t("menu.edit.self") }}
-    </v-btn>
-
-    <v-btn id="menu-structure" class="text-none" disabled>
-      {{ t("menu.structure.self") }}
-    </v-btn>
-
-    <v-btn id="menu-analysis" class="text-none" disabled>
-      {{ t("menu.analysis.self") }}
-    </v-btn>
-
-    <v-btn id="menu-help" class="text-none" disabled>
-      {{ t("menu.help.self") }}
     </v-btn>
   </div>
 
   <div>
-    <v-menu activator="#menu-file" location="bottom">
+    <v-menu
+      activator="#menu-file"
+      location="bottom"
+    >
       <v-list>
         <v-list-item
           density="compact"
-          @click="async () => await store.newFile()"
+          @click="async () => await store.fileNew()"
         >
           <template #prepend>
             <v-icon>mdi-file</v-icon>
@@ -39,7 +36,7 @@
 
         <v-list-item
           density="compact"
-          @click="async () => await store.openFile()"
+          @click="async () => await store.fileOpen()"
         >
           <template #prepend>
             <v-icon>mdi-folder-open</v-icon>
@@ -52,7 +49,7 @@
 
         <v-list-item
           density="compact"
-          @click="async () => await store.saveFile()"
+          @click="async () => await store.fileSave()"
         >
           <template #prepend>
             <v-icon>mdi-content-save</v-icon>
@@ -65,7 +62,7 @@
 
         <v-list-item
           density="compact"
-          @click="async () => await store.saveFileAs()"
+          @click="async () => await store.fileSaveAs()"
         >
           <template #prepend>
             <v-icon>mdi-content-save-move</v-icon>
@@ -80,7 +77,7 @@
 
         <v-list-item
           density="compact"
-          @click="async () => await store.exitApp()"
+          @click="async () => await store.appExit()"
         >
           <template #prepend>
             <v-icon>mdi-exit-to-app</v-icon>
@@ -93,7 +90,10 @@
       </v-list>
     </v-menu>
 
-    <v-menu activator="#menu-edit" location="bottom">
+    <v-menu
+      activator="#menu-edit"
+      location="bottom"
+    >
       <v-list>
         <v-list-item
           :disabled="
@@ -101,7 +101,7 @@
             store.current.sideBarType == SideBarType.Result
           "
           density="compact"
-          @click="() => store.undo()"
+          @click="() => store.appUndo()"
         >
           <template #prepend>
             <v-icon>mdi-undo</v-icon>
@@ -118,7 +118,7 @@
             store.current.sideBarType == SideBarType.Result
           "
           density="compact"
-          @click="() => store.redo()"
+          @click="() => store.appRedo()"
         >
           <template #prepend>
             <v-icon>mdi-redo</v-icon>
@@ -128,22 +128,47 @@
           </template>
           <template #append> Ctrl+Y </template>
         </v-list-item>
+
+        <v-list-item
+          :disabled="store.current.sideBarType == SideBarType.Result"
+          density="compact"
+          @click="() => store.selectedDelete()"
+        >
+          <template #prepend>
+            <v-icon>mdi-trash-can</v-icon>
+          </template>
+          <template #default>
+            <div class="pr-3">{{ t("menu.edit.selectedDelete") }}</div>
+          </template>
+          <template #append> Del </template>
+        </v-list-item>
+
+        <v-divider />
+
+        <v-list-item
+          :disabled="store.current.sideBarType == SideBarType.Result"
+          density="compact"
+          @click="() => (settings.showSettingsDialog = true)"
+        >
+          <template #prepend>
+            <v-icon>mdi-cog</v-icon>
+          </template>
+          <template #default>
+            <div class="pr-3">{{ t("menu.edit.settings") }}</div>
+          </template>
+        </v-list-item>
       </v-list>
     </v-menu>
-
-    <v-menu activator="#menu-structure" location="bottom"> </v-menu>
-
-    <v-menu activator="#menu-analysis" location="bottom"> </v-menu>
-
-    <v-menu activator="#menu-help" location="bottom"> </v-menu>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useI18n } from "vue-i18n";
 import useGlobalStore from "@/state/global";
+import useSettings from "@/state/settings";
 import { SideBarType } from "@/types/types";
 
 const { t } = useI18n();
 const store = useGlobalStore();
+const settings = useSettings();
 </script>

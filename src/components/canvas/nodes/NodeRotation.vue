@@ -24,13 +24,13 @@ const props = defineProps({
       y: 0,
       hinged: false,
       supports: [false, false, false],
-      support_angle: 0,
+      supportAngle: 0,
       springs: [0, 0, 0],
-      prescribed_displacement: [0, 0, 0],
+      prescribedDisplacements: [0, 0, 0],
       fx: 0,
       fy: 0,
       mz: 0,
-      force_angle: 0,
+      forceAngle: 0,
     }),
   },
   scale: {
@@ -41,7 +41,7 @@ const props = defineProps({
 
 const text = computed<string>(() =>
   settings.formatUnit(
-    Math.abs(props.node.prescribed_displacements[2]),
+    Math.abs(props.node.prescribedDisplacements[2]),
     UnitType.Rotation,
   ),
 );
@@ -72,13 +72,12 @@ const shapeConfig = computed(() => {
       },
     },
     text: {
-      x: props.node.prescribed_displacements[2] > 0 ? 12 : 45,
+      x: props.node.prescribedDisplacements[2] > 0 ? 12 : 45,
       y: 25,
       listening: false,
-      fontFamily: "Roboto",
       text: text.value,
       fill: "#004D40",
-      scaleX: props.node.prescribed_displacements[2] > 0 ? 1 : -1,
+      scaleX: props.node.prescribedDisplacements[2] > 0 ? 1 : -1,
     },
     group: {
       listening: false,
@@ -86,7 +85,7 @@ const shapeConfig = computed(() => {
       y: -props.node.y,
       scaleY: 1 / props.scale,
       scaleX:
-        props.node.prescribed_displacements[2] > 0
+        props.node.prescribedDisplacements[2] > 0
           ? 1 / props.scale
           : -1 / props.scale,
     },

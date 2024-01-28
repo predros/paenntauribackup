@@ -11,6 +11,7 @@ pub enum SectionType {
 }
 
 #[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct SectionDTO {
     pub id: usize,
     pub name: String,

@@ -19,16 +19,28 @@
       @mouseup="onMouseUp"
     />
 
-    <v-text v-if="text.start != null" :config="textConfig.start" />
-    <v-line v-if="props.member.t_sup != 0" :config="tempLinesConfig.start" />
+    <v-text
+      v-if="text.start !== null"
+      :config="textConfig.start"
+    />
+    <v-line
+      v-if="props.member.tSup != 0"
+      :config="tempLinesConfig.start"
+    />
 
-    <v-text v-if="text.end != null" :config="textConfig.end" />
-    <v-line v-if="props.member.t_inf != 0" :config="tempLinesConfig.end" />
+    <v-text
+      v-if="text.end !== null"
+      :config="textConfig.end"
+    />
+    <v-line
+      v-if="props.member.tInf != 0"
+      :config="tempLinesConfig.end"
+    />
   </v-group>
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, defineEmits } from "vue";
+import { computed, defineEmits, defineProps } from "vue";
 import { IMember, KonvaMouseEvent } from "@/types/types";
 import useSettings from "@/state/settings";
 import { UnitType } from "@/types/units";
@@ -51,8 +63,8 @@ const props = defineProps({
       qy0: 0,
       qx1: 0,
       qy1: 0,
-      t_sup: 0,
-      t_inf: 0,
+      tSup: 0,
+      tInf: 0,
     }),
   },
   scale: {
@@ -67,23 +79,23 @@ const props = defineProps({
 
 const emit = defineEmits(["clicked"]);
 
-const groupConfig = computed(() => {
-  return {
-    x: props.member.x0,
-    y: -props.member.y0,
-    rotation: -props.member.angle,
-  };
-});
+const groupConfig = computed(() => ({
+  x: props.member.x0,
+  y: -props.member.y0,
+  rotation: -props.member.angle,
+}));
 
 const text = computed(() => {
   let start: string | null = null;
   let end: string | null = null;
 
-  if (props.member.t_sup != 0)
-    start = settings.formatUnit(props.member.t_sup, UnitType.Temperature);
+  if (props.member.tSup != 0) {
+    start = settings.formatUnit(props.member.tSup, UnitType.Temperature);
+  }
 
-  if (props.member.t_inf != 0 && props.member.t_sup != props.member.t_inf)
-    end = settings.formatUnit(props.member.t_inf, UnitType.Temperature);
+  if (props.member.tInf != 0 && props.member.tSup != props.member.tInf) {
+    end = settings.formatUnit(props.member.tInf, UnitType.Temperature);
+  }
 
   return { start, end };
 });
@@ -92,43 +104,43 @@ const tempColors = computed(() => {
   let colorSup: string | null;
   let colorInf: string | null;
 
-  if (props.member.t_sup == props.member.t_inf) {
-    colorSup = colorInf = props.member.t_sup > 0 ? "#EF5350" : "#536DFE";
-  } else if (props.member.t_sup * props.member.t_inf > 0) {
-    if (props.member.t_sup > 0) {
-      colorSup =
-        props.member.t_sup > props.member.t_inf ? "#B71C1C" : "#EF5350";
-      colorInf =
-        props.member.t_sup > props.member.t_inf ? "#EF5350" : "#B71C1C";
+  if (props.member.tSup == props.member.tInf) {
+    colorSup = colorInf = props.member.tSup > 0 ? "#EF5350" : "#536DFE";
+  } else if (props.member.tSup * props.member.tInf > 0) {
+    if (props.member.tSup > 0) {
+      colorSup = props.member.tSup > props.member.tInf ? "#B71C1C" : "#EF5350";
+      colorInf = props.member.tSup > props.member.tInf ? "#EF5350" : "#B71C1C";
     } else {
-      colorSup =
-        props.member.t_sup < props.member.t_inf ? "#283593" : "#536DFE";
-      colorInf =
-        props.member.t_sup < props.member.t_inf ? "#536DFE" : "#283593";
+      colorSup = props.member.tSup < props.member.tInf ? "#283593" : "#536DFE";
+      colorInf = props.member.tSup < props.member.tInf ? "#536DFE" : "#283593";
     }
   } else {
-    if (props.member.t_sup == 0) colorSup = null;
-    else colorSup = props.member.t_sup > 0 ? "#EF5350" : "#536DFE";
+    if (props.member.tSup == 0) {
+      colorSup = null;
+    } else {
+      colorSup = props.member.tSup > 0 ? "#EF5350" : "#536DFE";
+    }
 
-    if (props.member.t_inf == 0) colorInf = null;
-    else colorInf = props.member.t_inf > 0 ? "#EF5350" : "#536DFE";
+    if (props.member.tInf == 0) {
+      colorInf = null;
+    } else {
+      colorInf = props.member.tInf > 0 ? "#EF5350" : "#536DFE";
+    }
   }
 
   return { sup: colorSup, inf: colorInf };
 });
 
-const lineConfig = computed(() => {
-  return {
-    x: 0,
-    y: 0,
-    offsetY: 0,
-    points: [0, 0, props.member.length, 0],
-    stroke: props.selected ? "#F57C00" : "#4682B4",
-    strokeWidth: 4,
-    scaleY: 1 / props.scale,
-    hitStrokeWidth: 10,
-  };
-});
+const lineConfig = computed(() => ({
+  x: 0,
+  y: 0,
+  offsetY: 0,
+  points: [0, 0, props.member.length, 0],
+  stroke: props.selected ? "#F57C00" : "#4682B4",
+  strokeWidth: 4,
+  scaleY: 1 / props.scale,
+  hitStrokeWidth: 10,
+}));
 
 const hingesConfig = computed(() => {
   let hingeStart = {};
@@ -168,7 +180,7 @@ const hingesConfig = computed(() => {
 const tempLinesConfig = computed(() => {
   let lineStart = {};
   let lineEnd = {};
-  if (props.member.t_sup != 0) {
+  if (props.member.tSup != 0) {
     lineStart = {
       x: 0,
       y: 0,
@@ -182,7 +194,7 @@ const tempLinesConfig = computed(() => {
     };
   }
 
-  if (props.member.t_inf != 0) {
+  if (props.member.tInf != 0) {
     lineEnd = {
       x: 0,
       y: 0,
@@ -209,10 +221,11 @@ const textConfig = computed(() => {
   let textEnd = {};
 
   let align = "center";
-  if (props.member.qx0 != 0 && props.member.qx0 == props.member.qx1)
+  if (props.member.qx0 != 0 && props.member.qx0 == props.member.qx1) {
     align = textScale < 0 ? "right" : "left";
+  }
 
-  if (text.value.start != null) {
+  if (text.value.start !== null) {
     textStart = {
       x: props.member.length / 2,
       y: -15 / props.scale,
@@ -230,7 +243,7 @@ const textConfig = computed(() => {
     };
   }
 
-  if (text.value.end != null) {
+  if (text.value.end !== null) {
     textEnd = {
       x: props.member.length / 2,
       y: 15 / props.scale,

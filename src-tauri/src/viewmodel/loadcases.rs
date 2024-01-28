@@ -5,6 +5,101 @@ use crate::models::{Loadcase, LoadcaseDTO, UnitType};
 use super::{ViewModel, ViewModelError};
 
 impl ViewModel {
+    pub fn loadcase_apply_load(
+        &mut self,
+        id: usize,
+        load: (f64, f64, f64, f64),
+        is_global: bool,
+        state_save: bool,
+    ) -> Result<usize, ViewModelError> {
+        if !self.loadcases_list.contains_key(&self.loadcase_current) {
+            return Err(ViewModelError::InvalidLoadcaseId(self.loadcase_current));
+        }
+
+        let qx0 = self.unit_from(load.0, UnitType::Load);
+        let qy0 = self.unit_from(load.1, UnitType::Load);
+        let qx1 = self.unit_from(load.2, UnitType::Load);
+        let qy1 = self.unit_from(load.3, UnitType::Load);
+
+        if state_save {
+            let _ = self.state_save();
+        }
+
+        let loadcase = self.loadcases_list.get_mut(&self.loadcase_current).unwrap();
+        match loadcase.set_load(id, qx0, qy0, qx1, qy1, is_global) {
+            Ok(_) => Ok(0),
+            Err(_) => Err(ViewModelError::InvalidMemberId(id)),
+        }
+    }
+
+    pub fn loadcase_apply_nodal(
+        &mut self,
+        id: usize,
+        fx: f64,
+        fy: f64,
+        mz: f64,
+        angle: f64,
+        state_save: bool,
+    ) -> Result<usize, ViewModelError> {
+        if !self.loadcases_list.contains_key(&self.loadcase_current) {
+            return Err(ViewModelError::InvalidLoadcaseId(self.loadcase_current));
+        }
+
+        if state_save {
+            let _ = self.state_save();
+        }
+
+        let fx = self.unit_from(fx, UnitType::Force);
+        let fy = self.unit_from(fy, UnitType::Force);
+        let mz = self.unit_from(mz, UnitType::Moment);
+        let angle = self.unit_from(angle, UnitType::Angle);
+
+        let loadcase = self.loadcases_list.get_mut(&self.loadcase_current).unwrap();
+        match loadcase.set_nodal(id, fx, fy, mz, angle) {
+            Ok(_) => Ok(0),
+            Err(_) => Err(ViewModelError::InvalidNodeId(id)),
+        }
+    }
+
+    pub fn loadcase_apply_temperature(
+        &mut self,
+        id: usize,
+        t_sup: f64,
+        t_inf: f64,
+        state_save: bool,
+    ) -> Result<usize, ViewModelError> {
+        if !self.loadcases_list.contains_key(&self.loadcase_current) {
+            return Err(ViewModelError::InvalidLoadcaseId(self.loadcase_current));
+        }
+
+        let t_sup = self.unit_from(t_sup, UnitType::Temperature);
+        let t_inf = self.unit_from(t_inf, UnitType::Temperature);
+
+        if state_save {
+            let _ = self.state_save();
+        }
+
+        let loadcase = self.loadcases_list.get_mut(&self.loadcase_current).unwrap();
+
+        match loadcase.set_temperature(id, t_sup, t_inf) {
+            Ok(_) => Ok(0),
+            Err(_) => Err(ViewModelError::InvalidMemberId(id)),
+        }
+    }
+
+    pub fn loadcase_delete(&mut self, id: usize) -> Result<usize, ViewModelError> {
+        match self.loadcases_list.remove(&id) {
+            Some(_) => {}
+            None => return Err(ViewModelError::InvalidLoadcaseId(id)),
+        }
+
+        for (_, combination) in self.combinations_list.iter_mut() {
+            let _ = combination.remove_loadcase(id);
+        }
+
+        Ok(0)
+    }
+
     pub fn loadcase_get_current(&self) -> usize {
         self.loadcase_current
     }
@@ -19,15 +114,6 @@ impl ViewModel {
             });
         }
         result
-    }
-
-    pub fn loadcase_set_current(&mut self, id: usize) -> Result<usize, ViewModelError> {
-        if self.loadcases_list.contains_key(&id) {
-            self.loadcase_current = id;
-            return Ok(0);
-        }
-
-        Err(ViewModelError::InvalidLoadcaseId(id))
     }
 
     pub fn loadcase_new(&mut self, name: String) -> Result<usize, ViewModelError> {
@@ -62,6 +148,15 @@ impl ViewModel {
         Ok(id)
     }
 
+    pub fn loadcase_set_current(&mut self, id: usize) -> Result<usize, ViewModelError> {
+        if self.loadcases_list.contains_key(&id) {
+            self.loadcase_current = id;
+            return Ok(0);
+        }
+
+        Err(ViewModelError::InvalidLoadcaseId(id))
+    }
+
     pub fn loadcase_update(
         &mut self,
         id: usize,
@@ -82,100 +177,5 @@ impl ViewModel {
         let _ = loadcase.set_name(new_name);
 
         Ok(0)
-    }
-
-    pub fn loadcase_delete(&mut self, id: usize) -> Result<usize, ViewModelError> {
-        match self.loadcases_list.remove(&id) {
-            Some(_) => {}
-            None => return Err(ViewModelError::InvalidLoadcaseId(id)),
-        }
-
-        for (_, combination) in self.combinations_list.iter_mut() {
-            let _ = combination.remove_loadcase(id);
-        }
-
-        Ok(0)
-    }
-
-    pub fn node_apply_forces(
-        &mut self,
-        id: usize,
-        fx: f64,
-        fy: f64,
-        mz: f64,
-        angle: f64,
-        save_state: bool,
-    ) -> Result<usize, ViewModelError> {
-        if !self.loadcases_list.contains_key(&self.loadcase_current) {
-            return Err(ViewModelError::InvalidLoadcaseId(self.loadcase_current));
-        }
-
-        if save_state {
-            let _ = self.save_state();
-        }
-
-        let fx = self.unit_from(fx, UnitType::Force);
-        let fy = self.unit_from(fy, UnitType::Force);
-        let mz = self.unit_from(mz, UnitType::Moment);
-        let angle = self.unit_from(angle, UnitType::Angle);
-
-        let loadcase = self.loadcases_list.get_mut(&self.loadcase_current).unwrap();
-        match loadcase.set_nodal(id, fx, fy, mz, angle) {
-            Ok(_) => Ok(0),
-            Err(_) => Err(ViewModelError::InvalidNodeId(id)),
-        }
-    }
-
-    pub fn member_apply_loads(
-        &mut self,
-        id: usize,
-        load: (f64, f64, f64, f64),
-        is_global: bool,
-        save_state: bool,
-    ) -> Result<usize, ViewModelError> {
-        if !self.loadcases_list.contains_key(&self.loadcase_current) {
-            return Err(ViewModelError::InvalidLoadcaseId(self.loadcase_current));
-        }
-
-        let qx0 = self.unit_from(load.0, UnitType::Load);
-        let qy0 = self.unit_from(load.1, UnitType::Load);
-        let qx1 = self.unit_from(load.2, UnitType::Load);
-        let qy1 = self.unit_from(load.3, UnitType::Load);
-
-        if save_state {
-            let _ = self.save_state();
-        }
-
-        let loadcase = self.loadcases_list.get_mut(&self.loadcase_current).unwrap();
-        match loadcase.set_load(id, qx0, qy0, qx1, qy1, is_global) {
-            Ok(_) => Ok(0),
-            Err(_) => Err(ViewModelError::InvalidMemberId(id)),
-        }
-    }
-
-    pub fn member_apply_temperatures(
-        &mut self,
-        id: usize,
-        t_sup: f64,
-        t_inf: f64,
-        save_state: bool,
-    ) -> Result<usize, ViewModelError> {
-        if !self.loadcases_list.contains_key(&self.loadcase_current) {
-            return Err(ViewModelError::InvalidLoadcaseId(self.loadcase_current));
-        }
-
-        let t_sup = self.unit_from(t_sup, UnitType::Temperature);
-        let t_inf = self.unit_from(t_inf, UnitType::Temperature);
-
-        if save_state {
-            let _ = self.save_state();
-        }
-
-        let loadcase = self.loadcases_list.get_mut(&self.loadcase_current).unwrap();
-
-        match loadcase.set_temperature(id, t_sup, t_inf) {
-            Ok(_) => Ok(0),
-            Err(_) => Err(ViewModelError::InvalidMemberId(id)),
-        }
     }
 }

@@ -1,4 +1,5 @@
 #[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct MemberResult {
     pub id: usize,
 

@@ -8,7 +8,10 @@
     role="presentation"
   >
     <title :id="props.iconName">{{ iconName }} icon</title>
-    <g :fill="props.iconColor" :stroke="props.iconColor">
+    <g
+      :fill="props.iconColor"
+      :stroke="props.iconColor"
+    >
       <slot />
     </g>
   </svg>

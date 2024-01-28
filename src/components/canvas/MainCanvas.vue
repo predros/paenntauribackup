@@ -16,13 +16,15 @@
     >
       <v-layer>
         <v-rect
-          v-if="store.current.clickType == ClickType.Select && mouseAnchor != null"
+          v-if="
+            store.current.clickType == ClickType.Select && mouseAnchor !== null
+          "
           :config="selectionRectConfig"
         />
         <v-line
           v-if="
             store.current.clickType == ClickType.NewMemberEnd &&
-            store.canvasProps.newMemberAnchor != null
+            store.canvasProps.newMemberAnchor !== null
           "
           :config="tempMemberConfig"
         />
@@ -80,7 +82,7 @@
           :node="node"
           :selected="store.current.selected.nodes.includes(node.id)"
           :scale="store.canvasProps.scale"
-          @clicked="onNodeClicked"
+          @mouse-up="onNodeMouseUp"
         />
         <SupportComponent
           v-for="node in nodesVisible.total"
@@ -184,24 +186,24 @@
 
 <script setup lang="ts">
 //#region Imports
-import { ref, defineProps, computed, defineEmits, watch } from "vue";
+import { computed, defineEmits, defineProps, ref, watch } from "vue";
 import { Stage } from "konva/lib/Stage";
 import {
+  ClickType,
+  Direction,
+  IMember,
+  IMemberResult,
   INode,
   INodeReaction,
-  IMember,
-  ClickType,
-  IMemberResult,
   KonvaMouseEvent,
   KonvaWheelEvent,
-  Direction,
 } from "@/types/types";
 import {
-  IRectangle,
   IPoint,
-  isPointInRect,
+  IRectangle,
   doesLineIntersectRect,
   floatEq,
+  isPointInRect,
 } from "@/helper/math";
 
 import NodeComponent from "@/components/canvas/nodes/NodeComponent.vue";
@@ -294,38 +296,65 @@ const nodesVisible = computed(() => {
 
   let currentReactions: INodeReaction[];
   if (store.current.result.isCombination) {
-    if (store.results.combinations.reactions != null)
-      currentReactions = store.results.combinations.reactions[store.current.result.id];
+    if (store.results.combinations.reactions !== null) {
+      currentReactions =
+        store.results.combinations.reactions[store.current.result.id];
+    }
   } else {
-    if (store.results.loadcases.reactions != null)
-      currentReactions = store.results.loadcases.reactions[store.current.result.id];
+    if (store.results.loadcases.reactions !== null) {
+      currentReactions =
+        store.results.loadcases.reactions[store.current.result.id];
+    }
   }
 
   nodes.nodesList.forEach((node: INode) => {
-    if (isPointInRect({ x: node.x, y: -node.y }, store.canvasProps.viewPortBounds)) {
+    if (
+      isPointInRect({ x: node.x, y: -node.y }, store.canvasProps.viewPortBounds)
+    ) {
       ret.total.push(node);
-      if (!floatEq(node.springs[0], 0)) ret.springs.x.push(node);
-      if (!floatEq(node.springs[1], 0)) ret.springs.y.push(node);
-      if (!floatEq(node.springs[2], 0)) ret.springs.z.push(node);
+      if (!floatEq(node.springs[0], 0)) {
+        ret.springs.x.push(node);
+      }
+      if (!floatEq(node.springs[1], 0)) {
+        ret.springs.y.push(node);
+      }
+      if (!floatEq(node.springs[2], 0)) {
+        ret.springs.z.push(node);
+      }
 
       if (store.current.clickType != ClickType.Result) {
-        if (!floatEq(node.fx, 0)) ret.forces.x.push(node);
-        if (!floatEq(node.fy, 0)) ret.forces.y.push(node);
-        if (!floatEq(node.mz, 0)) ret.forces.z.push(node);
+        if (!floatEq(node.fx, 0)) {
+          ret.forces.x.push(node);
+        }
+        if (!floatEq(node.fy, 0)) {
+          ret.forces.y.push(node);
+        }
+        if (!floatEq(node.mz, 0)) {
+          ret.forces.z.push(node);
+        }
 
-        if (!floatEq(node.prescribed_displacements[0], 0))
+        if (!floatEq(node.prescribedDisplacements[0], 0)) {
           ret.displacements.x.push(node);
-        if (!floatEq(node.prescribed_displacements[1], 0))
+        }
+        if (!floatEq(node.prescribedDisplacements[1], 0)) {
           ret.displacements.y.push(node);
-        if (!floatEq(node.prescribed_displacements[2], 0))
+        }
+        if (!floatEq(node.prescribedDisplacements[2], 0)) {
           ret.displacements.z.push(node);
-      } else if (currentReactions != null) {
+        }
+      } else if (currentReactions !== null) {
         const nodeReaction = currentReactions.find((x) => x.id == node.id);
         if (nodeReaction != undefined) {
           ret.result.result.push(nodeReaction);
-          if (!floatEq(nodeReaction.rx, 0)) ret.result.x.push(node);
-          if (!floatEq(nodeReaction.ry, 0)) ret.result.y.push(node);
-          if (!floatEq(nodeReaction.mz, 0)) ret.result.z.push(node);
+          if (!floatEq(nodeReaction.rx, 0)) {
+            ret.result.x.push(node);
+          }
+          if (!floatEq(nodeReaction.ry, 0)) {
+            ret.result.y.push(node);
+          }
+          if (!floatEq(nodeReaction.mz, 0)) {
+            ret.result.z.push(node);
+          }
         }
       }
     }
@@ -350,11 +379,14 @@ const membersVisible = computed(() => {
   let currentResults: IMemberResult[];
 
   if (store.current.result.isCombination) {
-    if (store.results.combinations.members != null)
-      currentResults = store.results.combinations.members[store.current.result.id];
+    if (store.results.combinations.members !== null) {
+      currentResults =
+        store.results.combinations.members[store.current.result.id];
+    }
   } else {
-    if (store.results.loadcases.members != null)
+    if (store.results.loadcases.members !== null) {
       currentResults = store.results.loadcases.members[store.current.result.id];
+    }
   }
 
   members.membersList.forEach((member: IMember) => {
@@ -370,7 +402,7 @@ const membersVisible = computed(() => {
       ret.total.push(member);
 
       if (store.current.clickType != ClickType.Result) {
-        if (member.is_global) {
+        if (member.isGlobal) {
           if (
             member.qx0 != 0 ||
             member.qx1 != 0 ||
@@ -388,7 +420,7 @@ const membersVisible = computed(() => {
             ret.loads.yLocal.push(member);
           }
         }
-      } else if (currentResults != null) {
+      } else if (currentResults !== null) {
         const memberResult = currentResults.find((x) => x.id == member.id);
         if (memberResult != undefined) {
           ret.result.member.push(member);
@@ -410,10 +442,11 @@ const cnvConfig = computed<IRectangle>(() => ({
 const selectionRectConfig = computed(() => {
   if (
     store.current.clickType != ClickType.Select ||
-    mouseAnchor.value == null ||
-    store.canvasProps.mousePosition == null
-  )
+    mouseAnchor.value === null ||
+    store.canvasProps.mousePosition === null
+  ) {
     return {};
+  }
 
   const width = store.canvasProps.mousePosition.x - mouseAnchor.value.x;
   const height = store.canvasProps.mousePosition.y - mouseAnchor.value.y;
@@ -432,13 +465,16 @@ const selectionRectConfig = computed(() => {
 const tempMemberConfig = computed(() => {
   if (
     store.current.clickType != ClickType.NewMemberEnd ||
-    store.canvasProps.newMemberAnchor == null ||
-    store.canvasProps.mousePosition == null
-  )
+    store.canvasProps.newMemberAnchor === null ||
+    store.canvasProps.mousePosition === null
+  ) {
     return {};
+  }
 
-  const width = store.canvasProps.mousePosition.x - store.canvasProps.newMemberAnchor.x;
-  const height = store.canvasProps.mousePosition.y - store.canvasProps.newMemberAnchor.y;
+  const width =
+    store.canvasProps.mousePosition.x - store.canvasProps.newMemberAnchor.x;
+  const height =
+    store.canvasProps.mousePosition.y - store.canvasProps.newMemberAnchor.y;
 
   return {
     x: store.canvasProps.newMemberAnchor.x,
@@ -453,7 +489,9 @@ const tempMemberConfig = computed(() => {
 
 //#region Functions
 function updateViewPort(): void {
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
 
   const widthBuffer = 0.5;
   const heightBuffer = 0.5;
@@ -475,17 +513,20 @@ function updateViewPort(): void {
 }
 
 function getCursorPosition(): { pointer: IPoint; mouseCoords: IPoint } | null {
-  if (!cnv.value)
+  if (!cnv.value) {
     return {
       pointer: { x: 0, y: 0 },
       mouseCoords: { x: 0, y: 0 },
     };
+  }
 
   const stage = cnv.value.getStage();
   const oldScale = stage.scaleX();
   const pointer = stage.getPointerPosition();
 
-  if (pointer == null) return null;
+  if (pointer === null) {
+    return null;
+  }
 
   return {
     pointer: pointer,
@@ -501,16 +542,22 @@ function getStage(): Stage | undefined {
 }
 
 function zoom(factor: number, onCursor: boolean): void {
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
   const stage = cnv.value.getStage();
   const oldScale = stage.scaleX();
   const newScale = oldScale * factor;
-  if (newScale > 5 || newScale < 0.5) return;
+  if (newScale > 5 || newScale < 0.5) {
+    return;
+  }
 
   let newPos = { x: 0, y: 0 };
   if (onCursor) {
     const cursorPos = getCursorPosition();
-    if (cursorPos == null) return;
+    if (cursorPos === null) {
+      return;
+    }
     const { pointer, mouseCoords } = cursorPos;
 
     newPos = {
@@ -548,7 +595,9 @@ function findNodeReaction(id: number): INodeReaction | undefined {
 
 //#region Event handlers
 function onWheel(e: KonvaWheelEvent): void {
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
 
   if (!zoomToggle.value) {
     zoomToggle.value = !zoomToggle.value;
@@ -574,10 +623,14 @@ function onWheel(e: KonvaWheelEvent): void {
 function onMouseDown(e: KonvaMouseEvent): void {
   e.evt.preventDefault();
 
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
 
   const cursorPos = getCursorPosition();
-  if (cursorPos == null) return;
+  if (cursorPos === null) {
+    return;
+  }
   const { mouseCoords } = cursorPos;
 
   if (e.evt.buttons == 1) {
@@ -591,9 +644,13 @@ function onMouseDown(e: KonvaMouseEvent): void {
 function onMouseUp(e: KonvaMouseEvent): void {
   e.evt.preventDefault();
 
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
   const cursorPos = getCursorPosition();
-  if (cursorPos == null) return;
+  if (cursorPos === null) {
+    return;
+  }
   const { mouseCoords } = cursorPos;
 
   cnv.value.getStage().draggable(false);
@@ -612,10 +669,14 @@ function onMouseUp(e: KonvaMouseEvent): void {
 
 function onMouseMove(e: KonvaMouseEvent): void {
   e.evt.preventDefault();
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
 
   const cursorPos = getCursorPosition();
-  if (cursorPos == null) return;
+  if (cursorPos === null) {
+    return;
+  }
   const { mouseCoords } = cursorPos;
 
   store.canvasProps.mousePosition = mouseCoords;
@@ -623,30 +684,39 @@ function onMouseMove(e: KonvaMouseEvent): void {
 
 function onDragMove(e: KonvaMouseEvent): void {
   e.evt.preventDefault();
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
   updateViewPort();
 }
 
 function onMouseEnter(e: KonvaMouseEvent): void {
   e.evt.preventDefault();
 
-  if (e.evt.buttons != 1) mouseAnchor.value = null;
+  if (e.evt.buttons != 1) {
+    mouseAnchor.value = null;
+  }
 }
 
 function onMouseLeave(): void {
   store.canvasProps.mousePosition = null;
-  if (store.current.clickType == ClickType.NewMemberEnd)
+  if (store.current.clickType == ClickType.NewMemberEnd) {
     store.current.clickType = ClickType.NewMemberStart;
+  }
 }
 
-function onNodeClicked(id: number): void {
+function onNodeMouseUp(id: number): void {
   emit("nodeClicked", id);
 }
 
 function onMemberClicked(id: number): void {
-  if (!cnv.value) return;
+  if (!cnv.value) {
+    return;
+  }
   const cursorPos = getCursorPosition();
-  if (cursorPos == null) return;
+  if (cursorPos === null) {
+    return;
+  }
 
   emit("memberClicked", id, cursorPos.mouseCoords.x, cursorPos.mouseCoords.y);
 }

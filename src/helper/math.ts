@@ -47,13 +47,15 @@ export function distance(start: IPoint, end: IPoint): number {
 export function angle(start: IPoint, end: IPoint): number {
   let result = Math.atan2(end.y - start.y, end.x - start.x) * (180 / Math.PI);
 
-  if (result < 0) result += 360;
-  if (result > 360) result %= 360;
+  if (result < 0) {
+    result += 360;
+  }
+  if (result > 360) {
+    result %= 360;
+  }
 
   return result;
 }
-
-
 
 /**
  * Checks if a given point is contained within a given axis-aligned rectangle.
@@ -130,7 +132,9 @@ export function projectOntoVector(
   projected: IPoint,
 ): IPoint | null {
   const lengthSquared = base.x * base.x + base.y * base.y;
-  if (lengthSquared == 0) return null;
+  if (lengthSquared == 0) {
+    return null;
+  }
 
   const dotProduct = base.x * projected.x + base.y * projected.y;
   const ratio = dotProduct / lengthSquared;
@@ -139,7 +143,9 @@ export function projectOntoVector(
 }
 
 export function lerp(start: IPoint, end: IPoint, x: number): number {
-  if (floatEq(start.x, end.x)) return end.y;
+  if (floatEq(start.x, end.x)) {
+    return end.y;
+  }
   const slope = (end.y - start.y) / (end.x - start.x);
   return start.y + slope * (x - start.x);
 }

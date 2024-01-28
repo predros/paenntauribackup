@@ -1,21 +1,38 @@
 use super::ViewModel;
 use super::ViewModelError;
-use crate::models::NodalForces;
 use crate::models::UnitType;
 use crate::models::{Direction, Node, NodeDTO};
 
 impl ViewModel {
-    pub fn node_get(&self, id: usize) -> Result<&Node, ViewModelError> {
-        for node in self.nodes_list.iter() {
-            if node.id() == id {
-                return Ok(node);
+    pub fn node_delete(&mut self, id: usize, state_save: bool) -> Result<usize, ViewModelError> {
+        let index = self.nodes_list.iter().position(|x| x.id() == id);
+
+        let index = match index {
+            Some(value) => value,
+            None => return Err(ViewModelError::InvalidNodeId(id)),
+        };
+
+        for member in self.members_list.iter() {
+            if member.node_start() == id || member.node_end() == id {
+                return Err(ViewModelError::NodeInUse);
             }
         }
-        Err(ViewModelError::InvalidMemberId(id))
+
+        if state_save {
+            let _ = self.state_save();
+        }
+
+        self.nodes_list.remove(index);
+
+        for (_, case) in self.loadcases_list.iter_mut() {
+            let _ = case.remove_node(id);
+        }
+
+        Ok(0)
     }
 
-    pub fn node_get_mut(&mut self, id: usize) -> Result<&mut Node, ViewModelError> {
-        for node in self.nodes_list.iter_mut() {
+    pub fn node_get(&self, id: usize) -> Result<&Node, ViewModelError> {
+        for node in self.nodes_list.iter() {
             if node.id() == id {
                 return Ok(node);
             }
@@ -79,90 +96,24 @@ impl ViewModel {
         Ok(result)
     }
 
-    pub fn node_get_pos(&self, id: usize) -> Result<(f64, f64), ViewModelError> {
-        let node = self.node_get(id);
-
-        match node {
-            Ok(value) => Ok(value.pos()),
-            Err(_) => Err(ViewModelError::InvalidNodeId(id)),
+    pub fn node_get_mut(&mut self, id: usize) -> Result<&mut Node, ViewModelError> {
+        for node in self.nodes_list.iter_mut() {
+            if node.id() == id {
+                return Ok(node);
+            }
         }
+        Err(ViewModelError::InvalidMemberId(id))
     }
 
-    pub fn node_get_hinges(&self, id: usize) -> Result<bool, ViewModelError> {
-        let node = self.node_get(id);
-
-        match node {
-            Ok(value) => Ok(value.hinged()),
-            Err(_) => Err(ViewModelError::InvalidNodeId(id)),
-        }
-    }
-
-    pub fn node_get_supports(&self, id: usize) -> Result<(bool, bool, bool, f64), ViewModelError> {
-        let node = self.node_get(id);
-
-        match node {
-            Ok(value) => Ok((
-                value.support(Direction::X),
-                value.support(Direction::Y),
-                value.support(Direction::Z),
-                value.support_angle(),
-            )),
-            Err(_) => Err(ViewModelError::InvalidNodeId(id)),
-        }
-    }
-
-    pub fn node_get_springs(&self, id: usize) -> Result<(f64, f64, f64), ViewModelError> {
-        let node = self.node_get(id);
-
-        match node {
-            Ok(value) => Ok((
-                value.spring(Direction::X),
-                value.spring(Direction::Y),
-                value.spring(Direction::Z),
-            )),
-            Err(_) => Err(ViewModelError::InvalidNodeId(id)),
-        }
-    }
-
-    pub fn node_get_prescribed_displacements(
-        &self,
-        id: usize,
-    ) -> Result<(f64, f64, f64), ViewModelError> {
-        let node = self.node_get(id);
-
-        match node {
-            Ok(value) => Ok((
-                value.prescribed_displacement(Direction::X),
-                value.prescribed_displacement(Direction::Y),
-                value.prescribed_displacement(Direction::Z),
-            )),
-            Err(_) => Err(ViewModelError::InvalidNodeId(id)),
-        }
-    }
-
-    pub fn node_get_nodal(&self, id: usize) -> Result<&NodalForces, ViewModelError> {
-        let case = self.loadcases_list.get(&self.loadcase_current);
-        let case = match case {
-            Some(value) => value,
-            None => return Err(ViewModelError::InvalidLoadcaseId(self.loadcase_current)),
-        };
-
-        let nodal = case.get_nodal(id);
-        match nodal {
-            Some(value) => Ok(value),
-            None => Err(ViewModelError::InvalidNodeId(id)),
-        }
-    }
-
-    pub fn node_new(&mut self, x: f64, y: f64, save_state: bool) -> Result<usize, ViewModelError> {
+    pub fn node_new(&mut self, x: f64, y: f64, state_save: bool) -> Result<usize, ViewModelError> {
         for node in self.nodes_list.iter() {
             if node.x() == x && node.y() == y {
                 return Err(ViewModelError::NodeAlreadyExists(node.id()));
             }
         }
 
-        if save_state {
-            let _ = self.save_state();
+        if state_save {
+            let _ = self.state_save();
         }
 
         self.nodes_list.sort_by_key(|a| a.id());
@@ -229,47 +180,20 @@ impl ViewModel {
         Ok(id)
     }
 
-    pub fn node_delete(&mut self, id: usize, save_state: bool) -> Result<usize, ViewModelError> {
-        let index = self.nodes_list.iter().position(|x| x.id() == id);
-
-        let index = match index {
-            Some(value) => value,
-            None => return Err(ViewModelError::InvalidNodeId(id)),
-        };
-
-        for member in self.members_list.iter() {
-            if member.node_start() == id || member.node_end() == id {
-                return Err(ViewModelError::NodeInUse);
-            }
-        }
-
-        if save_state {
-            let _ = self.save_state();
-        }
-
-        self.nodes_list.remove(index);
-
-        for (_, case) in self.loadcases_list.iter_mut() {
-            let _ = case.remove_node(id);
-        }
-
-        Ok(0)
-    }
-
     pub fn node_set_pos(
         &mut self,
         id: usize,
         x: f64,
         y: f64,
-        save_state: bool,
+        state_save: bool,
     ) -> Result<usize, ViewModelError> {
         match self.node_get(id) {
             Ok(_) => {}
             Err(_) => return Err(ViewModelError::InvalidNodeId(id)),
         }
 
-        if save_state {
-            let _ = self.save_state();
+        if state_save {
+            let _ = self.state_save();
         }
 
         let node = self.node_get_mut(id).unwrap();
@@ -282,15 +206,15 @@ impl ViewModel {
         &mut self,
         id: usize,
         hinge: bool,
-        save_state: bool,
+        state_save: bool,
     ) -> Result<usize, ViewModelError> {
         match self.node_get(id) {
             Ok(_) => {}
             Err(_) => return Err(ViewModelError::InvalidNodeId(id)),
         }
 
-        if save_state {
-            let _ = self.save_state();
+        if state_save {
+            let _ = self.state_save();
         }
 
         let node = self.node_get_mut(id).unwrap();
@@ -299,66 +223,13 @@ impl ViewModel {
         Ok(0)
     }
 
-    pub fn node_set_supports(
-        &mut self,
-        id: usize,
-        x: bool,
-        y: bool,
-        z: bool,
-        angle: f64,
-        save_state: bool,
-    ) -> Result<usize, ViewModelError> {
-        match self.node_get(id) {
-            Ok(_) => {}
-            Err(_) => return Err(ViewModelError::InvalidNodeId(id)),
-        }
-
-        if save_state {
-            let _ = self.save_state();
-        }
-
-        let node = self.node_get_mut(id).unwrap();
-        node.set_supports(x, y, z, angle);
-
-        Ok(0)
-    }
-
-    pub fn node_set_springs(
-        &mut self,
-        id: usize,
-        x: f64,
-        y: f64,
-        z: f64,
-        save_state: bool,
-    ) -> Result<usize, ViewModelError> {
-        match self.node_get(id) {
-            Ok(_) => {}
-            Err(_) => return Err(ViewModelError::InvalidNodeId(id)),
-        }
-
-        let x = self.unit_from(x, UnitType::Spring);
-        let y = self.unit_from(y, UnitType::Spring);
-        let z = self.unit_from(z, UnitType::TorsionSpring);
-
-        if save_state {
-            let _ = self.save_state();
-        }
-
-        let node = self.node_get_mut(id).unwrap();
-        let result = node.set_springs(x, y, z);
-        match result {
-            Ok(_) => Ok(0),
-            Err(value) => Err(ViewModelError::NegativeSpring(value)),
-        }
-    }
-
     pub fn node_set_prescribed_displacements(
         &mut self,
         id: usize,
         x: f64,
         y: f64,
         z: f64,
-        save_state: bool,
+        state_save: bool,
     ) -> Result<usize, ViewModelError> {
         match self.node_get(id) {
             Ok(_) => {}
@@ -369,12 +240,65 @@ impl ViewModel {
         let y = self.unit_from(y, UnitType::Displacement);
         let z = self.unit_from(z, UnitType::Rotation);
 
-        if save_state {
-            let _ = self.save_state();
+        if state_save {
+            let _ = self.state_save();
         }
 
         let node = self.node_get_mut(id).unwrap();
         node.set_prescribed_displacements(x, y, z);
+
+        Ok(0)
+    }
+
+    pub fn node_set_springs(
+        &mut self,
+        id: usize,
+        x: f64,
+        y: f64,
+        z: f64,
+        state_save: bool,
+    ) -> Result<usize, ViewModelError> {
+        match self.node_get(id) {
+            Ok(_) => {}
+            Err(_) => return Err(ViewModelError::InvalidNodeId(id)),
+        }
+
+        let x = self.unit_from(x, UnitType::Spring);
+        let y = self.unit_from(y, UnitType::Spring);
+        let z = self.unit_from(z, UnitType::TorsionSpring);
+
+        if state_save {
+            let _ = self.state_save();
+        }
+
+        let node = self.node_get_mut(id).unwrap();
+        let result = node.set_springs(x, y, z);
+        match result {
+            Ok(_) => Ok(0),
+            Err(value) => Err(ViewModelError::NegativeSpring(value)),
+        }
+    }
+
+    pub fn node_set_supports(
+        &mut self,
+        id: usize,
+        x: bool,
+        y: bool,
+        z: bool,
+        angle: f64,
+        state_save: bool,
+    ) -> Result<usize, ViewModelError> {
+        match self.node_get(id) {
+            Ok(_) => {}
+            Err(_) => return Err(ViewModelError::InvalidNodeId(id)),
+        }
+
+        if state_save {
+            let _ = self.state_save();
+        }
+
+        let node = self.node_get_mut(id).unwrap();
+        node.set_supports(x, y, z, angle);
 
         Ok(0)
     }

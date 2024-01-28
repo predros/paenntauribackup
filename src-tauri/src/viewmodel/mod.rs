@@ -1,8 +1,8 @@
-use crate::{backend::AnalysisResults, models::*};
+use crate::{analysis::AnalysisResults, models::*};
 use itertools::Itertools;
 use std::collections::HashMap;
 
-use crate::backend::{linear_analysis, AnalysisError};
+use crate::analysis::{linear_analysis, AnalysisError};
 
 mod combinations;
 mod io;
@@ -45,7 +45,7 @@ pub enum ViewModelError {
 
 pub struct ViewModel {
     current_file: String,
-    unsaved_changes: bool,
+    file_unsaved_changes: bool,
     nodes_list: Vec<Node>,
     members_list: Vec<Member>,
     materials_list: HashMap<usize, Material>,
@@ -122,7 +122,7 @@ impl ViewModel {
 
         let mut vm = ViewModel {
             current_file: "".to_string(),
-            unsaved_changes: false,
+            file_unsaved_changes: false,
             nodes_list: nodes,
             members_list: members,
             materials_list: materials,
@@ -137,173 +137,20 @@ impl ViewModel {
             settings,
         };
 
-        let settings = vm.load_settings();
+        let settings = vm.settings_load();
         match settings {
             Ok(value) => vm.settings = value,
             Err(_) => {
-                let _ = vm.save_settings();
+                let _ = vm.settings_save();
             }
         }
 
-        let _ = vm.new_file();
+        let _ = vm.file_new();
 
         vm
     }
 
-    pub fn save_state(&mut self) -> Result<(), ViewModelError> {
-        let nodes_current = serde_json::to_string(&self.nodes_list);
-        let nodes_current = match nodes_current {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToSerialize),
-        };
-
-        let members_current = serde_json::to_string(&self.members_list);
-        let members_current = match members_current {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToSerialize),
-        };
-
-        let loadcases_current = serde_json::to_string(&self.loadcases_list);
-        let loadcases_current = match loadcases_current {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToSerialize),
-        };
-
-        self.unsaved_changes = true;
-
-        self.undo_history
-            .push((nodes_current, members_current, loadcases_current));
-        self.redo_history.clear();
-
-        Ok(())
-    }
-
-    pub fn undo_state(&mut self) -> Result<(), ViewModelError> {
-        let previous = self.undo_history.pop();
-        let previous = match previous {
-            Some(value) => value,
-            None => return Ok(()),
-        };
-
-        let nodes_current = serde_json::to_string(&self.nodes_list);
-        let nodes_current = match nodes_current {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToSerialize),
-        };
-
-        let members_current = serde_json::to_string(&self.members_list);
-        let members_current = match members_current {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToSerialize),
-        };
-
-        let loadcases_current = serde_json::to_string(&self.loadcases_list);
-        let loadcases_current = match loadcases_current {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToSerialize),
-        };
-
-        let nodes_previous: Result<Vec<Node>, _> = serde_json::from_str(&previous.0);
-        let nodes_previous = match nodes_previous {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToDeserialize),
-        };
-
-        let members_previous: Result<Vec<Member>, _> = serde_json::from_str(&previous.1);
-        let members_previous = match members_previous {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToDeserialize),
-        };
-
-        let loadcases_previous: Result<HashMap<usize, Loadcase>, _> =
-            serde_json::from_str(&previous.2);
-        let loadcases_previous = match loadcases_previous {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToDeserialize),
-        };
-
-        self.nodes_list = nodes_previous;
-        self.members_list = members_previous;
-        self.loadcases_list = loadcases_previous;
-
-        self.unsaved_changes = true;
-
-        self.redo_history
-            .push((nodes_current, members_current, loadcases_current));
-
-        Ok(())
-    }
-
-    pub fn redo_state(&mut self) -> Result<(), ViewModelError> {
-        let next = self.redo_history.pop();
-        let next = match next {
-            Some(value) => value,
-            None => return Ok(()),
-        };
-
-        let nodes_current = serde_json::to_string(&self.nodes_list);
-        let nodes_current = match nodes_current {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToSerialize),
-        };
-
-        let members_current = serde_json::to_string(&self.members_list);
-        let members_current = match members_current {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToSerialize),
-        };
-
-        let loadcases_current = serde_json::to_string(&self.loadcases_list);
-        let loadcases_current = match loadcases_current {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToSerialize),
-        };
-
-        let nodes_next: Result<Vec<Node>, _> = serde_json::from_str(&next.0);
-        let nodes_next = match nodes_next {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToDeserialize),
-        };
-
-        let members_next: Result<Vec<Member>, _> = serde_json::from_str(&next.1);
-        let members_next = match members_next {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToDeserialize),
-        };
-
-        let loadcases_next: Result<HashMap<usize, Loadcase>, _> = serde_json::from_str(&next.2);
-        let loadcases_next = match loadcases_next {
-            Ok(value) => value,
-            Err(_) => return Err(ViewModelError::FailedToDeserialize),
-        };
-
-        self.nodes_list = nodes_next;
-        self.members_list = members_next;
-        self.loadcases_list = loadcases_next;
-
-        self.unsaved_changes = true;
-
-        self.undo_history
-            .push((nodes_current, members_current, loadcases_current));
-
-        Ok(())
-    }
-
-    pub fn history_len(&self) -> (usize, usize) {
-        (self.undo_history.len(), self.redo_history.len())
-    }
-
-    pub fn settings_get(&self) -> Result<Settings, ViewModelError> {
-        Ok(self.settings.clone())
-    }
-
-    pub fn settings_set(&mut self, settings: Settings) -> Result<(), ViewModelError> {
-        self.settings = settings.clone();
-
-        self.save_settings()
-    }
-
-    pub fn run_linear_analysis(&self) -> Result<AnalysisResults, ViewModelError> {
+    pub fn analysis_run_linear(&self) -> Result<AnalysisResults, ViewModelError> {
         let result = linear_analysis(
             &self.nodes_list,
             &self.members_list,
@@ -405,6 +252,50 @@ impl ViewModel {
         Ok(result)
     }
 
+    pub fn error_get_dto(&self, error: ViewModelError) -> (String, usize) {
+        match error {
+            ViewModelError::EmptyName => ("alerts.emptyName".to_string(), 0),
+            ViewModelError::InvalidCombinationId(id) => {
+                ("alerts.invalidCombinationId".to_string(), id)
+            }
+            ViewModelError::InvalidLoadcaseId(id) => ("alerts.invalidLoadcaseId".to_string(), id),
+            ViewModelError::InvalidMaterialId(id) => ("alerts.invalidMaterialId".to_string(), id),
+            ViewModelError::InvalidMemberId(id) => ("alerts.invalidMemberId".to_string(), id),
+            ViewModelError::InvalidNodeId(id) => ("alerts.invalidNodeId".to_string(), id),
+            ViewModelError::InvalidSectionId(id) => ("alerts.invalidSectionId".to_string(), id),
+            ViewModelError::MaterialInUse => ("alerts.materialInUse".to_string(), 0),
+            ViewModelError::MemberAlreadyExists(id) => {
+                ("alerts.memberAlreadyExists".to_string(), id)
+            }
+            ViewModelError::NameInUse => ("alerts.nameInUse".to_string(), 0),
+            ViewModelError::NegativeSpring(_) => ("alerts.negativeSpring".to_string(), 0),
+            ViewModelError::NodeAlreadyExists(id) => ("alerts.nodeAlreadyExists".to_string(), id),
+            ViewModelError::NodeInUse => ("alert.nodeInUse".to_string(), 0),
+            ViewModelError::NonDistinctNodes => ("alert.distinctNodes".to_string(), 0),
+            ViewModelError::NonPositiveValue => ("alert.nonPositiveValue".to_string(), 0),
+            ViewModelError::SectionInUse => ("alert.sectionInUse".to_string(), 0),
+            ViewModelError::UnstableStructure => ("alert.unstableStructure".to_string(), 0),
+            ViewModelError::FailedToRead => ("alert.failedToRead".to_string(), 0),
+            ViewModelError::FailedToWrite => ("alert.failedToWrite".to_string(), 0),
+            ViewModelError::FailedToSerialize => ("alert.failedToSerialize".to_string(), 0),
+            ViewModelError::FailedToDeserialize => ("alert.failedToDeserialize".to_string(), 0),
+            ViewModelError::InvalidDimension => ("alert.invalidDimension".to_string(), 0),
+        }
+    }
+
+    pub fn material_delete(&mut self, id: usize) -> Result<usize, ViewModelError> {
+        for member in self.members_list.iter() {
+            if member.material() == id {
+                return Err(ViewModelError::MaterialInUse);
+            }
+        }
+
+        match self.materials_list.remove(&id) {
+            Some(_) => Ok(0),
+            None => Err(ViewModelError::InvalidMaterialId(id)),
+        }
+    }
+
     pub fn material_get(&self, id: usize) -> Result<&Material, ViewModelError> {
         let material = self.materials_list.get(&id);
         match material {
@@ -423,48 +314,6 @@ impl ViewModel {
                 elasticity: self.unit_to(value.elasticity(), UnitType::Elasticity),
                 thermal: self.unit_to(value.thermal(), UnitType::Thermal),
             });
-        }
-        result
-    }
-
-    pub fn section_get(&self, id: usize) -> Result<&Section, ViewModelError> {
-        let section = self.sections_list.get(&id);
-        match section {
-            Some(value) => Ok(value),
-            None => Err(ViewModelError::InvalidSectionId(id)),
-        }
-    }
-
-    pub fn section_get_all(&self) -> Vec<SectionDTO> {
-        let mut result: Vec<SectionDTO> = vec![];
-
-        for (id, value) in self.sections_list.iter() {
-            let params = value.params();
-
-            let params = if value.section_type() == SectionType::Generic {
-                vec![
-                    self.unit_from(params[0], UnitType::Inertia),
-                    self.unit_from(params[1], UnitType::Area),
-                    self.unit_from(params[2], UnitType::Dimension),
-                    self.unit_from(params[3], UnitType::Dimension),
-                ]
-            } else {
-                params
-                    .iter()
-                    .map(|x| self.unit_from(*x, UnitType::Dimension))
-                    .collect()
-            };
-
-            result.push(SectionDTO {
-                id: *id,
-                name: value.name(),
-                section_type: value.section_type(),
-                inertia: self.unit_to(value.inertia(), UnitType::Inertia),
-                area: self.unit_to(value.area(), UnitType::Area),
-                y_sup: self.unit_to(value.y_sup(), UnitType::Dimension),
-                y_inf: self.unit_to(value.y_inf(), UnitType::Dimension),
-                params,
-            })
         }
         result
     }
@@ -533,17 +382,59 @@ impl ViewModel {
         Ok(0)
     }
 
-    pub fn material_delete(&mut self, id: usize) -> Result<usize, ViewModelError> {
+    pub fn section_delete(&mut self, id: usize) -> Result<usize, ViewModelError> {
         for member in self.members_list.iter() {
-            if member.material() == id {
-                return Err(ViewModelError::MaterialInUse);
+            if member.section() == id {
+                return Err(ViewModelError::SectionInUse);
             }
         }
 
-        match self.materials_list.remove(&id) {
+        match self.sections_list.remove(&id) {
             Some(_) => Ok(0),
-            None => Err(ViewModelError::InvalidMaterialId(id)),
+            None => Err(ViewModelError::InvalidSectionId(id)),
         }
+    }
+
+    pub fn section_get(&self, id: usize) -> Result<&Section, ViewModelError> {
+        let section = self.sections_list.get(&id);
+        match section {
+            Some(value) => Ok(value),
+            None => Err(ViewModelError::InvalidSectionId(id)),
+        }
+    }
+
+    pub fn section_get_all(&self) -> Vec<SectionDTO> {
+        let mut result: Vec<SectionDTO> = vec![];
+
+        for (id, value) in self.sections_list.iter() {
+            let params = value.params();
+
+            let params = if value.section_type() == SectionType::Generic {
+                vec![
+                    self.unit_from(params[0], UnitType::Inertia),
+                    self.unit_from(params[1], UnitType::Area),
+                    self.unit_from(params[2], UnitType::Dimension),
+                    self.unit_from(params[3], UnitType::Dimension),
+                ]
+            } else {
+                params
+                    .iter()
+                    .map(|x| self.unit_from(*x, UnitType::Dimension))
+                    .collect()
+            };
+
+            result.push(SectionDTO {
+                id: *id,
+                name: value.name(),
+                section_type: value.section_type(),
+                inertia: self.unit_to(value.inertia(), UnitType::Inertia),
+                area: self.unit_to(value.area(), UnitType::Area),
+                y_sup: self.unit_to(value.y_sup(), UnitType::Dimension),
+                y_inf: self.unit_to(value.y_inf(), UnitType::Dimension),
+                params,
+            })
+        }
+        result
     }
 
     pub fn section_new(
@@ -658,55 +549,164 @@ impl ViewModel {
         Ok(0)
     }
 
-    pub fn section_delete(&mut self, id: usize) -> Result<usize, ViewModelError> {
-        for member in self.members_list.iter() {
-            if member.section() == id {
-                return Err(ViewModelError::SectionInUse);
-            }
-        }
-
-        match self.sections_list.remove(&id) {
-            Some(_) => Ok(0),
-            None => Err(ViewModelError::InvalidSectionId(id)),
-        }
+    pub fn state_history_length(&self) -> (usize, usize) {
+        (self.undo_history.len(), self.redo_history.len())
     }
 
-    pub fn error_to_string(&self, error: ViewModelError) -> (String, usize) {
-        match error {
-            ViewModelError::EmptyName => ("alerts.emptyName".to_string(), 0),
-            ViewModelError::InvalidCombinationId(id) => {
-                ("alerts.invalidCombinationId".to_string(), id)
-            }
-            ViewModelError::InvalidLoadcaseId(id) => ("alerts.invalidLoadcaseId".to_string(), id),
-            ViewModelError::InvalidMaterialId(id) => ("alerts.invalidMaterialId".to_string(), id),
-            ViewModelError::InvalidMemberId(id) => ("alerts.invalidMemberId".to_string(), id),
-            ViewModelError::InvalidNodeId(id) => ("alerts.invalidNodeId".to_string(), id),
-            ViewModelError::InvalidSectionId(id) => ("alerts.invalidSectionId".to_string(), id),
-            ViewModelError::MaterialInUse => ("alerts.materialInUse".to_string(), 0),
-            ViewModelError::MemberAlreadyExists(id) => {
-                ("alerts.memberAlreadyExists".to_string(), id)
-            }
-            ViewModelError::NameInUse => ("alerts.nameInUse".to_string(), 0),
-            ViewModelError::NegativeSpring(_) => ("alerts.negativeSpring".to_string(), 0),
-            ViewModelError::NodeAlreadyExists(id) => ("alerts.nodeAlreadyExists".to_string(), id),
-            ViewModelError::NodeInUse => ("alert.nodeInUse".to_string(), 0),
-            ViewModelError::NonDistinctNodes => ("alert.distinctNodes".to_string(), 0),
-            ViewModelError::NonPositiveValue => ("alert.nonPositiveValue".to_string(), 0),
-            ViewModelError::SectionInUse => ("alert.sectionInUse".to_string(), 0),
-            ViewModelError::UnstableStructure => ("alert.unstableStructure".to_string(), 0),
-            ViewModelError::FailedToRead => ("alert.failedToRead".to_string(), 0),
-            ViewModelError::FailedToWrite => ("alert.failedToWrite".to_string(), 0),
-            ViewModelError::FailedToSerialize => ("alert.failedToSerialize".to_string(), 0),
-            ViewModelError::FailedToDeserialize => ("alert.failedToDeserialize".to_string(), 0),
-            ViewModelError::InvalidDimension => ("alert.invalidDimension".to_string(), 0),
-        }
+    pub fn state_redo(&mut self) -> Result<(), ViewModelError> {
+        let next = self.redo_history.pop();
+        let next = match next {
+            Some(value) => value,
+            None => return Ok(()),
+        };
+
+        let nodes_current = serde_json::to_string(&self.nodes_list);
+        let nodes_current = match nodes_current {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToSerialize),
+        };
+
+        let members_current = serde_json::to_string(&self.members_list);
+        let members_current = match members_current {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToSerialize),
+        };
+
+        let loadcases_current = serde_json::to_string(&self.loadcases_list);
+        let loadcases_current = match loadcases_current {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToSerialize),
+        };
+
+        let nodes_next: Result<Vec<Node>, _> = serde_json::from_str(&next.0);
+        let nodes_next = match nodes_next {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToDeserialize),
+        };
+
+        let members_next: Result<Vec<Member>, _> = serde_json::from_str(&next.1);
+        let members_next = match members_next {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToDeserialize),
+        };
+
+        let loadcases_next: Result<HashMap<usize, Loadcase>, _> = serde_json::from_str(&next.2);
+        let loadcases_next = match loadcases_next {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToDeserialize),
+        };
+
+        self.nodes_list = nodes_next;
+        self.members_list = members_next;
+        self.loadcases_list = loadcases_next;
+
+        self.file_unsaved_changes = true;
+
+        self.undo_history
+            .push((nodes_current, members_current, loadcases_current));
+
+        Ok(())
     }
 
-    pub fn unit_to(&self, value: f64, unit_type: UnitType) -> f64 {
-        self.settings.units.convert_to(value, unit_type)
+    pub fn state_save(&mut self) -> Result<(), ViewModelError> {
+        let nodes_current = serde_json::to_string(&self.nodes_list);
+        let nodes_current = match nodes_current {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToSerialize),
+        };
+
+        let members_current = serde_json::to_string(&self.members_list);
+        let members_current = match members_current {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToSerialize),
+        };
+
+        let loadcases_current = serde_json::to_string(&self.loadcases_list);
+        let loadcases_current = match loadcases_current {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToSerialize),
+        };
+
+        self.file_unsaved_changes = true;
+
+        self.undo_history
+            .push((nodes_current, members_current, loadcases_current));
+        self.redo_history.clear();
+
+        Ok(())
+    }
+
+    pub fn state_undo(&mut self) -> Result<(), ViewModelError> {
+        let previous = self.undo_history.pop();
+        let previous = match previous {
+            Some(value) => value,
+            None => return Ok(()),
+        };
+
+        let nodes_current = serde_json::to_string(&self.nodes_list);
+        let nodes_current = match nodes_current {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToSerialize),
+        };
+
+        let members_current = serde_json::to_string(&self.members_list);
+        let members_current = match members_current {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToSerialize),
+        };
+
+        let loadcases_current = serde_json::to_string(&self.loadcases_list);
+        let loadcases_current = match loadcases_current {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToSerialize),
+        };
+
+        let nodes_previous: Result<Vec<Node>, _> = serde_json::from_str(&previous.0);
+        let nodes_previous = match nodes_previous {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToDeserialize),
+        };
+
+        let members_previous: Result<Vec<Member>, _> = serde_json::from_str(&previous.1);
+        let members_previous = match members_previous {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToDeserialize),
+        };
+
+        let loadcases_previous: Result<HashMap<usize, Loadcase>, _> =
+            serde_json::from_str(&previous.2);
+        let loadcases_previous = match loadcases_previous {
+            Ok(value) => value,
+            Err(_) => return Err(ViewModelError::FailedToDeserialize),
+        };
+
+        self.nodes_list = nodes_previous;
+        self.members_list = members_previous;
+        self.loadcases_list = loadcases_previous;
+
+        self.file_unsaved_changes = true;
+
+        self.redo_history
+            .push((nodes_current, members_current, loadcases_current));
+
+        Ok(())
+    }
+
+    pub fn settings_get(&self) -> Result<Settings, ViewModelError> {
+        Ok(self.settings.clone())
+    }
+
+    pub fn settings_set(&mut self, settings: Settings) -> Result<(), ViewModelError> {
+        self.settings = settings.clone();
+
+        self.settings_save()
     }
 
     pub fn unit_from(&self, value: f64, unit_type: UnitType) -> f64 {
         self.settings.units.convert_from(value, unit_type)
+    }
+
+    pub fn unit_to(&self, value: f64, unit_type: UnitType) -> f64 {
+        self.settings.units.convert_to(value, unit_type)
     }
 }

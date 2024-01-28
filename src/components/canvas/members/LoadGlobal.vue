@@ -1,15 +1,24 @@
 <template>
   <v-group :config="groupConfig">
     <v-line :config="shapeConfig.lineFirst" />
-    <v-line v-if="root != null" :config="shapeConfig.lineSecond" />
+    <v-line
+      v-if="root !== null"
+      :config="shapeConfig.lineSecond"
+    />
     <v-arrow
       v-for="index in numArrows"
       :key="index"
       :config="arrowConfig(index)"
     />
 
-    <v-text v-if="text.start != null" :config="shapeConfig.textStart" />
-    <v-text v-if="text.end != null" :config="shapeConfig.textEnd" />
+    <v-text
+      v-if="text.start !== null"
+      :config="shapeConfig.textStart"
+    />
+    <v-text
+      v-if="text.end !== null"
+      :config="shapeConfig.textEnd"
+    />
   </v-group>
 </template>
 
@@ -17,7 +26,7 @@
 //#region Imports
 import { computed, defineProps } from "vue";
 import { IMember } from "@/types/types";
-import { distance, lerp, floatEq } from "@/helper/math";
+import { distance, floatEq, lerp } from "@/helper/math";
 import { UnitType } from "@/types/units";
 
 import useSettings from "@/state/settings";
@@ -44,9 +53,9 @@ const props = defineProps({
       qy0: 0,
       qx1: 0,
       qy1: 0,
-      is_global: false,
-      t_sup: false,
-      t_inf: false,
+      isGlobal: false,
+      tSup: false,
+      tInf: false,
     }),
   },
   scale: {
@@ -77,10 +86,14 @@ const numArrows = computed(() => {
  * Computes, if it exists, the point where the load's y-direction is zero (otherwise, returns null).
  */
 const root = computed<number | null>(() => {
-  if (floatEq(loadVec.value.y.slope, 0)) return null;
+  if (floatEq(loadVec.value.y.slope, 0)) {
+    return null;
+  }
   const root = -loadVec.value.y.intercept / loadVec.value.y.slope;
 
-  if (root < 0 || root > props.member.length) return null;
+  if (root < 0 || root > props.member.length) {
+    return null;
+  }
 
   return root;
 });
@@ -219,8 +232,8 @@ const shapeConfig = computed(() => {
       ? 1
       : -1;
 
-  if (text.value.start != null) {
-    if (text.value.end == null) {
+  if (text.value.start !== null) {
+    if (text.value.end === null) {
       textStart = {
         x: props.member.length / 2,
         y: -(lengthStart.y + Math.sign(start.y) * 25) / props.scale,
@@ -255,7 +268,7 @@ const shapeConfig = computed(() => {
     }
   }
 
-  if (text.value.end != null) {
+  if (text.value.end !== null) {
     textEnd = {
       x: props.member.length / 2,
       y: -(lengthEnd.y + Math.sign(end.y) * 25) / props.scale,
@@ -274,7 +287,7 @@ const shapeConfig = computed(() => {
   }
 
   if (lengthStart.y != 0 || lengthEnd.y != 0) {
-    if (root.value != null) {
+    if (root.value !== null) {
       lineFirst = {
         x: 0,
         y: (-Math.sign(start.y) * 15) / props.scale,
@@ -341,7 +354,9 @@ function arrowConfig(index: number): object {
 
   if (floatEq(lengthY, 0)) {
     lengthX = 5;
-    if (index == 1) return {};
+    if (index == 1) {
+      return {};
+    }
   }
 
   return {

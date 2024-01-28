@@ -6,9 +6,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, defineProps, PropType, watch } from "vue";
+import { PropType, computed, defineProps, onMounted, ref, watch } from "vue";
 
-import { INode, Direction } from "@/types/types";
+import { Direction, INode } from "@/types/types";
 import { UnitType } from "@/types/units";
 import useSettings from "@/state/settings";
 
@@ -23,13 +23,13 @@ const props = defineProps({
       y: 0,
       hinged: false,
       supports: [false, false, false],
-      support_angle: 0,
+      supportAngle: 0,
       springs: [0, 0, 0],
-      prescribed_displacement: [0, 0, 0],
+      prescribedDisplacements: [0, 0, 0],
       fx: 0,
       fy: 0,
       mz: 0,
-      force_angle: 0,
+      forceAngle: 0,
     }),
   },
   scale: {
@@ -43,60 +43,63 @@ const props = defineProps({
 });
 
 const spring = computed(() => {
-  if (props.direction == Direction.None) return 0;
+  if (props.direction == Direction.None) {
+    return 0;
+  }
   return props.node.springs[(props.direction as number) - 1];
 });
 
 const source = ref<HTMLImageElement>();
 
 const text = computed<string>(() => {
-  if (props.direction == Direction.Z)
+  if (props.direction == Direction.Z) {
     return settings.formatUnit(spring.value, UnitType.TorsionSpring);
-  else return settings.formatUnit(spring.value, UnitType.Spring);
+  }
+  return settings.formatUnit(spring.value, UnitType.Spring);
 });
 
 const shapeConfig = computed(() => {
-  if (!source.value) return { image: null, text: null, group: null };
-  else {
-    let x = 0;
-    let y = 0;
-    switch (props.direction) {
-      case Direction.X:
-      case Direction.Y:
-        x = 10;
-        y = 0;
-        break;
-      case Direction.Z:
-        x = 12;
-        y = 14;
-        break;
-      default:
-        break;
-    }
-
-    return {
-      image: {
-        image: source.value,
-        offsetX: x,
-        offsetY: y,
-        listening: false,
-      },
-      text: {
-        x: props.direction == Direction.Z ? 22 : 15,
-        y: props.direction == Direction.Z ? 0 : 20,
-        listening: false,
-        fontFamily: "Roboto",
-        text: text.value,
-      },
-      group: {
-        x: props.node.x,
-        y: -props.node.y,
-        scaleX: 1 / props.scale,
-        scaleY: 1 / props.scale,
-        rotation: props.direction == Direction.X ? 90 : 0,
-      },
-    };
+  if (!source.value) {
+    return { image: null, text: null, group: null };
   }
+
+  let x = 0;
+  let y = 0;
+  switch (props.direction) {
+    case Direction.X:
+    case Direction.Y:
+      x = 10;
+      y = 0;
+      break;
+    case Direction.Z:
+      x = 12;
+      y = 14;
+      break;
+    default:
+      break;
+  }
+
+  return {
+    image: {
+      image: source.value,
+      offsetX: x,
+      offsetY: y,
+      listening: false,
+    },
+    text: {
+      x: props.direction == Direction.Z ? 22 : 15,
+      y: props.direction == Direction.Z ? 0 : 20,
+      listening: false,
+      text: text.value,
+    },
+    group: {
+      x: props.node.x,
+      y: -props.node.y,
+      scaleX: 1 / props.scale,
+      scaleY: 1 / props.scale,
+      rotation: props.direction == Direction.X ? 90 : 0,
+    },
+  };
 });
 
 function setImage(): void {

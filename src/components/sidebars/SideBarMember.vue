@@ -5,7 +5,10 @@
     </v-card-title>
 
     <v-card-text>
-      <v-form ref="form" validate-on="submit">
+      <v-form
+        ref="form"
+        validate-on="submit"
+      >
         <v-row>
           <v-col>
             <v-text-field
@@ -82,7 +85,11 @@
             hide-no-data
           >
             <template #prepend-inner>
-              <IconBase :width="30" :height="30" :icon-color="'#767676'">
+              <IconBase
+                :width="30"
+                :height="30"
+                :icon-color="'#767676'"
+              >
                 <IconSections />
               </IconBase>
             </template>
@@ -91,17 +98,27 @@
       </v-form>
 
       <v-row class="pt-10 px-2">
-        <v-btn block color="primary" @click="onSubmit">
+        <v-btn
+          block
+          color="primary"
+          @click="onSubmit"
+        >
           {{ t("buttons.save") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onReset">
+        <v-btn
+          block
+          @click="onReset"
+        >
           {{ t("buttons.clear") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onClose">
+        <v-btn
+          block
+          @click="onClose"
+        >
           {{ t("buttons.close") }}
         </v-btn>
       </v-row>
@@ -110,14 +127,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from "vue";
+import { computed, reactive, ref } from "vue";
 import { VForm } from "vuetify/components";
 import { floatEq } from "@/helper/math";
 import { isValidNumber, parseNumber } from "@/helper/misc";
 
 import IconBase from "@/components/icons/IconBase.vue";
 import IconSections from "@/components/icons/IconSections.vue";
-import { IMaterial, ISection, ClickType, SideBarType } from "@/types/types";
+import { ClickType, IMaterial, ISection, SideBarType } from "@/types/types";
 
 import useGlobalStore from "@/state/global";
 import useMemberStore from "@/state/members";
@@ -147,11 +164,11 @@ function validNumber(value: string): boolean | string {
 }
 
 function validMaterial(value: number): boolean | string {
-  return value != null || t("errors.validMaterial");
+  return value !== null || t("errors.validMaterial");
 }
 
 function validSection(value: number): boolean | string {
-  return value != null || t("errors.validSection");
+  return value !== null || t("errors.validSection");
 }
 
 function distinctPoints(): boolean | string {
@@ -165,8 +182,9 @@ function distinctPoints(): boolean | string {
     Number.isNaN(parsedX1) ||
     Number.isNaN(parsedY0) ||
     Number.isNaN(parsedY1)
-  )
-    return true; // The other rules will deal with this case
+  ) {
+    return true;
+  } // The other rules will deal with this case
 
   return (
     (parsedX0 != parsedX1 && parsedY0 != parsedY1) || t("errors.distinctPoints")
@@ -184,8 +202,9 @@ function uniqueMember(): boolean | string {
     Number.isNaN(parsedX1) ||
     Number.isNaN(parsedY0) ||
     Number.isNaN(parsedY1)
-  )
-    return true; // The other rules will deal with this case
+  ) {
+    return true;
+  } // The other rules will deal with this case
 
   let exists = false;
 
@@ -206,7 +225,6 @@ function uniqueMember(): boolean | string {
       floatEq(member.y0, parsedY1)
     ) {
       exists = true;
-      return;
     }
   });
 
@@ -214,7 +232,9 @@ function uniqueMember(): boolean | string {
 }
 
 async function onSubmit(): Promise<void> {
-  if (!form.value) return;
+  if (!form.value) {
+    return;
+  }
 
   const { valid } = await form.value.validate();
 
@@ -224,7 +244,9 @@ async function onSubmit(): Promise<void> {
     const parsedX1 = parseNumber(member.x1);
     const parsedY1 = parseNumber(member.y1);
 
-    if (store.current.material == null || store.current.section == null) return;
+    if (store.current.material === null || store.current.section === null) {
+      return;
+    }
 
     members.newMember(
       parsedX0,
@@ -246,7 +268,9 @@ async function onSubmit(): Promise<void> {
 }
 
 function onReset(): void {
-  if (!form.value) return;
+  if (!form.value) {
+    return;
+  }
   form.value.reset();
 }
 

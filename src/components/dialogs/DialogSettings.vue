@@ -1,15 +1,22 @@
 <template>
-  <v-card class="py-4 px-6" style="min-width: 600px; min-height: 500px">
+  <v-card
+    class="py-4 px-6"
+    style="min-width: 600px; min-height: 500px"
+  >
     <v-card-title class="pb-6">
       {{ t("dialogs.settings.title") }}
     </v-card-title>
 
     <v-card-text class="d-flex flex-row">
-      <v-col class="mr-2" md="4">
+      <v-col
+        class="mr-2"
+        md="4"
+      >
         <v-row>
           <v-select
             v-model="currentSettings.locale"
             label="Locale"
+            disabled
             :items="[
               { title: t('dialogs.settings.locales.enUS'), value: 'en-US' },
               { title: t('dialogs.settings.locales.ptBR'), value: 'pt-BR' },
@@ -18,7 +25,7 @@
         </v-row>
         <v-row>
           <v-checkbox
-            v-model="currentSettings.dark_theme"
+            v-model="currentSettings.darkTheme"
             color="primary"
             disabled
             :label="t('dialogs.settings.darkTheme')"
@@ -34,7 +41,7 @@
             <v-row>
               <v-col>
                 <v-text-field
-                  v-model="currentSettings.grid_spacing.x"
+                  v-model="currentSettings.gridSpacing.x"
                   :label="t('dialogs.settings.gridSpacings.x')"
                   :placeholder="`(${settings.getUnitName(UnitType.Length)})`"
                   :rules="[validNumber, isPositive]"
@@ -42,7 +49,7 @@
               </v-col>
               <v-col>
                 <v-text-field
-                  v-model="currentSettings.grid_spacing.y"
+                  v-model="currentSettings.gridSpacing.y"
                   :label="t('dialogs.settings.gridSpacings.y')"
                   :placeholder="`(${settings.getUnitName(UnitType.Length)})`"
                   :rules="[validNumber, isPositive]"
@@ -82,7 +89,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.length[0]"
+                  v-model="currentSettings.unitPrecision.length[0]"
                   :items="unitPrecision"
                   :label="t('dialogs.settings.unitPrecision')"
                   density="comfortable"
@@ -90,7 +97,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.length[1]"
+                  v-model="currentSettings.unitPrecision.length[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -114,7 +121,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.force[0]"
+                  v-model="currentSettings.unitPrecision.force[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -122,7 +129,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.force[1]"
+                  v-model="currentSettings.unitPrecision.force[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -146,7 +153,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.moment[0]"
+                  v-model="currentSettings.unitPrecision.moment[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -154,7 +161,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.moment[1]"
+                  v-model="currentSettings.unitPrecision.moment[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -178,7 +185,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.load[0]"
+                  v-model="currentSettings.unitPrecision.load[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -186,7 +193,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.load[1]"
+                  v-model="currentSettings.unitPrecision.load[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -210,7 +217,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.angle[0]"
+                  v-model="currentSettings.unitPrecision.angle[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -218,7 +225,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.angle[1]"
+                  v-model="currentSettings.unitPrecision.angle[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -244,7 +251,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.temperature[0]"
+                  v-model="currentSettings.unitPrecision.temperature[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -252,7 +259,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.temperature[1]"
+                  v-model="currentSettings.unitPrecision.temperature[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -276,7 +283,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.displacement[0]"
+                  v-model="currentSettings.unitPrecision.displacement[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -284,7 +291,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.displacement[1]"
+                  v-model="currentSettings.unitPrecision.displacement[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -308,7 +315,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.rotation[0]"
+                  v-model="currentSettings.unitPrecision.rotation[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -316,7 +323,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.rotation[1]"
+                  v-model="currentSettings.unitPrecision.rotation[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -340,7 +347,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.spring[0]"
+                  v-model="currentSettings.unitPrecision.spring[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -348,7 +355,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.spring[1]"
+                  v-model="currentSettings.unitPrecision.spring[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -372,7 +379,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.torsion_spring[0]"
+                  v-model="currentSettings.unitPrecision.torsionSpring[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -380,7 +387,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.torsion_spring[1]"
+                  v-model="currentSettings.unitPrecision.torsionSpring[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -406,7 +413,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.elasticity[0]"
+                  v-model="currentSettings.unitPrecision.elasticity[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -414,7 +421,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.elasticity[1]"
+                  v-model="currentSettings.unitPrecision.elasticity[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -438,7 +445,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.thermal[0]"
+                  v-model="currentSettings.unitPrecision.thermal[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -446,7 +453,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.thermal[1]"
+                  v-model="currentSettings.unitPrecision.thermal[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -470,7 +477,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.inertia[0]"
+                  v-model="currentSettings.unitPrecision.inertia[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -478,7 +485,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.inertia[1]"
+                  v-model="currentSettings.unitPrecision.inertia[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -502,7 +509,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.area[0]"
+                  v-model="currentSettings.unitPrecision.area[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -510,7 +517,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.area[1]"
+                  v-model="currentSettings.unitPrecision.area[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -534,7 +541,7 @@
               </v-col>
               <v-col>
                 <v-select
-                  v-model="currentSettings.unit_precision.dimension[0]"
+                  v-model="currentSettings.unitPrecision.dimension[0]"
                   :items="unitPrecision"
                   density="comfortable"
                   :label="t('dialogs.settings.unitPrecision')"
@@ -542,7 +549,7 @@
               </v-col>
               <v-col>
                 <v-checkbox
-                  v-model="currentSettings.unit_precision.dimension[1]"
+                  v-model="currentSettings.unitPrecision.dimension[1]"
                   color="primary"
                   label="0e+0"
                   density="comfortable"
@@ -555,15 +562,25 @@
     </v-card-text>
 
     <div class="d-flex justify-end">
-      <v-btn class="pl-3 pr-3 mr-3" color="primary" @click="onSubmitAndClose">
+      <v-btn
+        class="pl-3 pr-3 mr-3"
+        color="primary"
+        @click="onSubmitAndClose"
+      >
         {{ t("buttons.saveAndClose") }}
       </v-btn>
 
-      <v-btn class="pl-3 pr-3 mr-3" @click="onSubmit">
+      <v-btn
+        class="pl-3 pr-3 mr-3"
+        @click="onSubmit"
+      >
         {{ t("buttons.apply") }}
       </v-btn>
 
-      <v-btn class="pl-3 pr-3" @click="onClose">
+      <v-btn
+        class="pl-3 pr-3"
+        @click="onClose"
+      >
         {{ t("buttons.cancel") }}
       </v-btn>
     </div>
@@ -571,18 +588,18 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, computed, onMounted } from "vue";
+import { computed, onMounted, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 import useSettings from "@/state/settings";
 import {
   ISettings,
-  UnitType,
+  IUnitPrecision,
   UnitAngle,
-  UnitLength,
   UnitForce,
+  UnitLength,
   UnitStress,
   UnitTemperature,
-  IUnitPrecision,
+  UnitType,
 } from "@/types/units";
 import { isValidNumber } from "@/helper/misc";
 
@@ -590,9 +607,9 @@ const { t } = useI18n();
 const settings = useSettings();
 
 const currentSettings = reactive({
-  dark_theme: false,
+  darkTheme: false,
   locale: "pt-BR",
-  grid_spacing: {
+  gridSpacing: {
     x: 100,
     y: 100,
   },
@@ -613,7 +630,7 @@ const currentSettings = reactive({
     area: "",
     dimension: "",
   },
-  unit_precision: {
+  unitPrecision: {
     length: [1, false],
     force: [1, false],
     angle: [1, false],
@@ -623,7 +640,7 @@ const currentSettings = reactive({
     displacement: [1, false],
     rotation: [1, false],
     spring: [1, false],
-    torsion_spring: [1, false],
+    torsionSpring: [1, false],
     elasticity: [1, false],
     thermal: [1, false],
     inertia: [1, false],
@@ -688,12 +705,12 @@ const unitPrecision = reactive([
 onMounted(() => {
   const getSettings = settings.getSettings();
 
-  currentSettings.dark_theme = getSettings.dark_theme;
+  currentSettings.darkTheme = getSettings.darkTheme;
   currentSettings.locale = getSettings.locale;
-  currentSettings.grid_spacing.x = getSettings.grid_spacing[0];
-  currentSettings.grid_spacing.y = getSettings.grid_spacing[1];
+  currentSettings.gridSpacing.x = getSettings.gridSpacing[0];
+  currentSettings.gridSpacing.y = getSettings.gridSpacing[1];
 
-  currentSettings.unit_precision = getSettings.unit_precision;
+  currentSettings.unitPrecision = getSettings.unitPrecision;
 
   const units = getSettings.units;
   const options = unitOptions.value;
@@ -717,8 +734,8 @@ onMounted(() => {
     options.spring[5 * units.spring[0] + units.spring[1]];
   currentSettings.units.torsionSpring =
     options.torsionSpring[
-      2 * (5 * units.torsion_spring[0] + units.torsion_spring[1]) +
-        units.torsion_spring[2]
+      2 * (5 * units.torsionSpring[0] + units.torsionSpring[1]) +
+        units.torsionSpring[2]
     ];
 });
 
@@ -728,8 +745,8 @@ async function onSubmitAndClose(): Promise<void> {
 }
 
 async function onSubmit(): Promise<void> {
-  const gridTempX = settings.lengthToCm(currentSettings.grid_spacing.x);
-  const gridTempY = settings.lengthToCm(currentSettings.grid_spacing.y);
+  const gridTempX = settings.lengthToCm(currentSettings.gridSpacing.x);
+  const gridTempY = settings.lengthToCm(currentSettings.gridSpacing.y);
 
   const units = unitOptions.value;
   const current = currentSettings.units;
@@ -758,39 +775,45 @@ async function onSubmit(): Promise<void> {
     rotation < 0 ||
     temperature < 0 ||
     thermal < 0
-  )
+  ) {
     return;
+  }
 
   const load = units.load.indexOf(current.load);
-  if (load < 0) return;
+  if (load < 0) {
+    return;
+  }
   const load1 = load % 5;
   const load0 = load - load1;
 
   const moment = units.moment.indexOf(current.moment);
-  if (moment < 0) return;
+  if (moment < 0) {
+    return;
+  }
   const moment1 = moment % 5;
   const moment0 = (moment - moment1) / 5;
 
   const spring = units.spring.indexOf(current.spring);
-  if (spring < 0) return;
+  if (spring < 0) {
+    return;
+  }
   const spring1 = spring % 5;
   const spring0 = (spring - spring1) / 5;
 
   const torsionSpring = units.torsionSpring.indexOf(current.torsionSpring);
-  if (torsionSpring < 0) return;
+  if (torsionSpring < 0) {
+    return;
+  }
   const torsionSpring2 = torsionSpring % 2;
   const aux = (torsionSpring - torsionSpring2) / 2;
   const torsionSpring1 = aux % 5;
   const torsionSpring0 = (aux - torsionSpring1) / 5;
 
   const result: ISettings = {
-    dark_theme: currentSettings.dark_theme,
+    darkTheme: currentSettings.darkTheme,
     locale: currentSettings.locale,
-    grid_spacing: [
-      currentSettings.grid_spacing.x,
-      currentSettings.grid_spacing.y,
-    ],
-    unit_precision: currentSettings.unit_precision as IUnitPrecision,
+    gridSpacing: [currentSettings.gridSpacing.x, currentSettings.gridSpacing.y],
+    unitPrecision: currentSettings.unitPrecision as IUnitPrecision,
     units: {
       angle: angle as UnitAngle,
       area: area as UnitLength,
@@ -806,7 +829,7 @@ async function onSubmit(): Promise<void> {
       rotation: rotation as UnitAngle,
       temperature: temperature as UnitTemperature,
       thermal: thermal as UnitTemperature,
-      torsion_spring: [
+      torsionSpring: [
         torsionSpring0 as UnitForce,
         torsionSpring1 as UnitLength,
         torsionSpring2 as UnitAngle,
@@ -816,8 +839,8 @@ async function onSubmit(): Promise<void> {
 
   await settings.saveSettings(result);
 
-  currentSettings.grid_spacing.x = settings.lengthFromCm(gridTempX);
-  currentSettings.grid_spacing.y = settings.lengthFromCm(gridTempY);
+  currentSettings.gridSpacing.x = settings.lengthFromCm(gridTempX);
+  currentSettings.gridSpacing.y = settings.lengthFromCm(gridTempY);
 }
 
 function onClose(): void {

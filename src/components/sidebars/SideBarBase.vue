@@ -1,5 +1,8 @@
 <template>
-  <v-card flat class="pt-10 pl-4 pr-6">
+  <v-card
+    flat
+    class="pt-10 pl-4 pr-6"
+  >
     <SideBarNode
       :class="store.current.sideBarType == SideBarType.NewNode ? '' : 'd-none'"
     />
@@ -7,7 +10,9 @@
       :class="store.current.sideBarType == SideBarType.MatSec ? '' : 'd-none'"
     />
     <SideBarMember
-      :class="store.current.sideBarType == SideBarType.NewMember ? '' : 'd-none'"
+      :class="
+        store.current.sideBarType == SideBarType.NewMember ? '' : 'd-none'
+      "
     />
     <SideBarSupports
       :class="store.current.sideBarType == SideBarType.Supports ? '' : 'd-none'"
@@ -16,13 +21,19 @@
       :class="store.current.sideBarType == SideBarType.Hinges ? '' : 'd-none'"
     />
     <SideBarForces
-      :class="store.current.sideBarType == SideBarType.NodalForces ? '' : 'd-none'"
+      :class="
+        store.current.sideBarType == SideBarType.NodalForces ? '' : 'd-none'
+      "
     />
     <SideBarLoads
-      :class="store.current.sideBarType == SideBarType.MemberLoads ? '' : 'd-none'"
+      :class="
+        store.current.sideBarType == SideBarType.MemberLoads ? '' : 'd-none'
+      "
     />
     <SideBarTemperature
-      :class="store.current.sideBarType == SideBarType.ThermalLoads ? '' : 'd-none'"
+      :class="
+        store.current.sideBarType == SideBarType.ThermalLoads ? '' : 'd-none'
+      "
     />
     <SideBarResult
       :class="store.current.sideBarType == SideBarType.Result ? '' : 'd-none'"

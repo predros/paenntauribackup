@@ -1,0 +1,51 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:vue/vue3-essential",
+    "@vue/eslint-config-typescript",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2021
+  },
+  "plugins": ["vue", "prettier", "@typescript-eslint"],
+  "rules": {
+    "prettier/prettier": ["error"],
+    "for-direction": "error",
+    "no-compare-neg-zero": "error",
+    "no-cond-assign": "error",
+    "no-const-assign": "error",
+    "no-dupe-keys": "error",
+    "no-duplicate-case": "error",
+    "no-irregular-whitespace": "error",
+    "no-self-compare": "warn",
+    "no-sparse-arrays": "error",
+    "no-unexpected-multiline": "warn",
+    "no-unreachable": "warn",
+    "use-isnan": "error",
+    "camelcase": "warn",
+    "arrow-body-style": "error",
+    "block-scoped-var": "error",
+    "curly": "warn",
+    "no-console": "warn",
+    "no-else-return": "error",
+    "no-eq-null": "error",
+    "no-return-assign": "error",
+    "no-sequences": "error",
+    "no-unneeded-ternary": "warn",
+    "no-useless-call": "warn",
+    "no-useless-concat": "warn",
+    "no-useless-return": "warn",
+    "no-var": "error",
+    "no-void": "error",
+    "prefer-const": "error",
+    "yoda": "warn",
+    "eqeqeq": "off"
+  }
+}

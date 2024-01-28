@@ -5,9 +5,15 @@
     </v-card-title>
 
     <v-card-text>
-      <v-form ref="form" validate-on="submit">
+      <v-form
+        ref="form"
+        validate-on="submit"
+      >
         <v-row class="pb-6">
-          <v-tabs v-model="tab" background-color="primary">
+          <v-tabs
+            v-model="tab"
+            background-color="primary"
+          >
             <v-tab :value="0">{{ t("sidebars.supports.labelSupports") }}</v-tab>
             <v-tab :value="1">{{ t("sidebars.supports.labelSprings") }}</v-tab>
             <v-tab :value="2">{{
@@ -16,7 +22,10 @@
           </v-tabs>
         </v-row>
 
-        <v-window v-model="tab" class="pt-3">
+        <v-window
+          v-model="tab"
+          class="pt-3"
+        >
           <v-window-item :value="0">
             <h3 class="pb-1">{{ t("sidebars.supports.titleSupports") }}</h3>
             <v-checkbox
@@ -117,17 +126,27 @@
       </v-form>
 
       <v-row class="pt-8 px-2">
-        <v-btn block color="primary" @click="onSubmit">
+        <v-btn
+          block
+          color="primary"
+          @click="onSubmit"
+        >
           {{ t("buttons.applyToSelection") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onReset">
+        <v-btn
+          block
+          @click="onReset"
+        >
           {{ t("buttons.clear") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onClose">
+        <v-btn
+          block
+          @click="onClose"
+        >
           {{ t("buttons.close") }}
         </v-btn>
       </v-row>
@@ -136,7 +155,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { reactive, ref } from "vue";
 import { VForm } from "vuetify/components";
 import { isValidNumber, parseNumber } from "@/helper/misc";
 import { ClickType, SideBarType } from "@/types/types";
@@ -174,12 +193,16 @@ const displacement = reactive({
 });
 
 function onReset() {
-  if (!form.value) return;
+  if (!form.value) {
+    return;
+  }
   form.value.reset();
 }
 
 async function onSubmit() {
-  if (!form.value) return;
+  if (!form.value) {
+    return;
+  }
 
   const { valid } = await form.value.validate();
 

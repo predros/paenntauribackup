@@ -41,7 +41,7 @@ export default {
     edit: "Edit",
     manageMaterials: "Manage materials",
     manageSections: "Manage sections",
-    newMaterial: "New material",
+    materialNew: "New material",
     save: "Save",
   },
   dialogs: {

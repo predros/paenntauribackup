@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export enum UnitType {
   Length,
   Force,
@@ -53,11 +54,11 @@ export enum UnitStress {
 }
 
 export interface ISettings {
-  dark_theme: boolean;
+  darkTheme: boolean;
   locale: string;
-  grid_spacing: [number, number];
+  gridSpacing: [number, number];
   units: IUnitSettings;
-  unit_precision: IUnitPrecision;
+  unitPrecision: IUnitPrecision;
 }
 
 export interface IUnitSettings {
@@ -70,7 +71,7 @@ export interface IUnitSettings {
   displacement: UnitLength;
   rotation: UnitAngle;
   spring: [UnitForce, UnitLength];
-  torsion_spring: [UnitForce, UnitLength, UnitAngle];
+  torsionSpring: [UnitForce, UnitLength, UnitAngle];
   elasticity: UnitStress;
   thermal: UnitTemperature;
   inertia: UnitLength;
@@ -88,7 +89,7 @@ export interface IUnitPrecision {
   displacement: [number, boolean];
   rotation: [number, boolean];
   spring: [number, boolean];
-  torsion_spring: [number, boolean];
+  torsionSpring: [number, boolean];
   elasticity: [number, boolean];
   thermal: [number, boolean];
   inertia: [number, boolean];

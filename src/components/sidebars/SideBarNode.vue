@@ -5,7 +5,10 @@
     </v-card-title>
 
     <v-card-text>
-      <v-form ref="form" validate-on="submit">
+      <v-form
+        ref="form"
+        validate-on="submit"
+      >
         <v-row>
           <v-col>
             <v-text-field
@@ -36,17 +39,27 @@
       </v-form>
 
       <v-row class="pt-10 px-2">
-        <v-btn block color="primary" @click="onSubmit">
+        <v-btn
+          block
+          color="primary"
+          @click="onSubmit"
+        >
           {{ t("buttons.save") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onReset">
+        <v-btn
+          block
+          @click="onReset"
+        >
           {{ t("buttons.clear") }}
         </v-btn>
       </v-row>
       <v-row class="pt-2 px-2">
-        <v-btn block @click="onClose">
+        <v-btn
+          block
+          @click="onClose"
+        >
           {{ t("buttons.close") }}
         </v-btn>
       </v-row>
@@ -55,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from "vue";
+import { reactive, ref } from "vue";
 import { VForm } from "vuetify/components";
 import { floatEq } from "@/helper/math";
 import { isValidNumber, parseNumber } from "@/helper/misc";
@@ -86,13 +99,14 @@ function uniqueNode(): boolean | string {
   const parsedX = parseNumber(node.x);
   const parsedY = parseNumber(node.y);
 
-  if (Number.isNaN(parsedX) || Number.isNaN(parsedY)) return true;
+  if (Number.isNaN(parsedX) || Number.isNaN(parsedY)) {
+    return true;
+  }
 
   let exists = false;
   nodes.nodesList.forEach((n) => {
     if (floatEq(n.x, parsedX) && floatEq(n.y, parsedY)) {
       exists = true;
-      return;
     }
   });
 
@@ -100,7 +114,9 @@ function uniqueNode(): boolean | string {
 }
 
 async function onSubmit(): Promise<void> {
-  if (!form.value) return;
+  if (!form.value) {
+    return;
+  }
 
   const { valid } = await form.value.validate();
 
@@ -114,7 +130,9 @@ async function onSubmit(): Promise<void> {
 }
 
 function onReset(): void {
-  if (!form.value) return;
+  if (!form.value) {
+    return;
+  }
   form.value.reset();
 }
 

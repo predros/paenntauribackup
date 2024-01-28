@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
-import { IMember } from "@/types/types";
+import { computed, ref } from "vue";
+import { type IMember } from "@/types/types";
 import { invoke } from "@tauri-apps/api/tauri";
 import useGlobalStore from "@/state/global";
 import useNodeStore from "@/state/nodes";
@@ -31,7 +31,7 @@ export default defineStore("members", () => {
         min = Math.min(min, Math.abs(member.qy1));
       }
 
-      if (member.is_global) {
+      if (member.isGlobal) {
         if (member.qx0 != 0) {
           max = Math.max(max, Math.abs(member.qx0));
           min = Math.min(min, Math.abs(member.qx0));
@@ -46,9 +46,9 @@ export default defineStore("members", () => {
   });
 
   async function fetchMembers(): Promise<void> {
-    const result = await invoke("get_member_dtos").catch((e: string[]) =>
-      store.showAlert(t(e[0], [e[1]])),
-    );
+    const result = await invoke("member_get_dtos").catch((e: string[]) => {
+      store.appAlert(t(e[0], [e[1]]));
+    });
     membersList.value = result as IMember[];
   }
 
@@ -78,14 +78,16 @@ export default defineStore("members", () => {
       realY1 = y1;
     }
 
-    const result = await invoke("new_member", {
+    const result = await invoke("member_new", {
       x0: realX0,
       y0: realY0,
       x1: realX1,
       y1: realY1,
       materialId,
       sectionId,
-    }).catch((e: string[]) => store.showAlert(t(e[0], [e[1]])));
+    }).catch((e: string[]) => {
+      store.appAlert(t(e[0], [e[1]]));
+    });
 
     const [undoLen, redoLen] = result as [number, number];
     store.historyLength.undo = undoLen;
@@ -104,16 +106,20 @@ export default defineStore("members", () => {
   ): Promise<void> {
     const ids = store.current.selected.members;
 
-    if (ids.length == 0) return;
+    if (ids.length == 0) {
+      return;
+    }
 
-    const result = await invoke("apply_member_loads", {
+    const result = await invoke("selected_apply_member_loads", {
       ids,
       qx0,
       qy0,
       qx1,
       qy1,
       isGlobal,
-    }).catch((e: string[]) => store.showAlert(t(e[0], [e[1]])));
+    }).catch((e: string[]) => {
+      store.appAlert(t(e[0], [e[1]]));
+    });
 
     const [undoLen, redoLen] = result as [number, number];
     store.historyLength.undo = undoLen;
@@ -125,13 +131,17 @@ export default defineStore("members", () => {
   async function applyTemperatures(tSup: number, tInf: number): Promise<void> {
     const ids = store.current.selected.members;
 
-    if (ids.length == 0) return;
+    if (ids.length == 0) {
+      return;
+    }
 
-    const result = await invoke("apply_member_temperatures", {
+    const result = await invoke("selected_apply_member_temperatures", {
       ids,
       tSup,
       tInf,
-    }).catch((e: string[]) => store.showAlert(t(e[0], [e[1]])));
+    }).catch((e: string[]) => {
+      store.appAlert(t(e[0], [e[1]]));
+    });
 
     const [undoLen, redoLen] = result as [number, number];
     store.historyLength.undo = undoLen;

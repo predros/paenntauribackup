@@ -10,7 +10,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, defineProps, PropType } from "vue";
+import { PropType, computed, defineProps } from "vue";
 import { Direction, INode } from "@/types/types";
 import { UnitType } from "@/types/units";
 import useSettings from "@/state/settings";
@@ -26,13 +26,13 @@ const props = defineProps({
       y: 0,
       hinged: false,
       supports: [false, false, false],
-      support_angle: 0,
+      supportAngle: 0,
       springs: [0, 0, 0],
-      prescribed_displacement: [0, 0, 0],
+      prescribedDisplacements: [0, 0, 0],
       fx: 0,
       fy: 0,
       mz: 0,
-      force_angle: 0,
+      forceAngle: 0,
     }),
   },
   scale: {
@@ -48,9 +48,9 @@ const props = defineProps({
 const displacement = computed<number>(() => {
   switch (props.direction) {
     case Direction.X:
-      return props.node.prescribed_displacements[0];
+      return props.node.prescribedDisplacements[0];
     case Direction.Y:
-      return props.node.prescribed_displacements[1];
+      return props.node.prescribedDisplacements[1];
     default:
       return 0;
   }
@@ -61,9 +61,13 @@ const text = computed<string>(() =>
 );
 
 const shapeConfig = computed(() => {
-  let angle = -props.node.support_angle;
-  if (props.direction == Direction.Y) angle -= 90;
-  if (displacement.value < 0) angle += 180;
+  let angle = -props.node.supportAngle;
+  if (props.direction == Direction.Y) {
+    angle -= 90;
+  }
+  if (displacement.value < 0) {
+    angle += 180;
+  }
   angle %= 360;
 
   const textScale =
@@ -110,7 +114,6 @@ const shapeConfig = computed(() => {
       height: 12,
       listening: false,
       align: "center",
-      fontFamily: "Roboto",
       text: text.value,
       scaleX: textScale,
       scaleY: textScale,

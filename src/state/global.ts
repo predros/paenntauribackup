@@ -1,26 +1,26 @@
 import { defineStore } from "pinia";
-import { ref, computed } from "vue";
+import { computed, ref } from "vue";
 import { invoke } from "@tauri-apps/api";
-import { appWindow, LogicalPosition } from "@tauri-apps/api/window";
+import { LogicalPosition, appWindow } from "@tauri-apps/api/window";
 import {
-  ICombination,
-  ILoadcase,
-  IMaterial,
-  ISection,
   ClickType,
-  SideBarType,
+  type ICombination,
+  type ILoadcase,
+  type IMaterial,
+  type IMemberResult,
+  type ISection,
+  type ReactionsDict,
   ResultType,
-  ResultsDict,
-  ReactionsDict,
-  SectionType,
-  IMemberResult,
+  type ResultsDict,
+  type SectionType,
+  SideBarType,
 } from "@/types/types";
 
 import useNodeStore from "@/state/nodes";
 import useMemberStore from "@/state/members";
 import useSettings from "@/state/settings";
 
-import { IPoint, IRectangle } from "@/helper/math";
+import { type IPoint, type IRectangle } from "@/helper/math";
 import { useI18n } from "vue-i18n";
 import { ask, open, save } from "@tauri-apps/api/dialog";
 import { exit } from "@tauri-apps/api/process";
@@ -47,14 +47,14 @@ export default defineStore("global", () => {
       x: 0,
       y: 0,
       width: 0,
-      height: 0
-    } as IRectangle
+      height: 0,
+    } as IRectangle,
   });
 
-  const showDialog = ref({
+  const dialogs = ref({
     alert: {
       show: false,
-      text: ""
+      text: "",
     },
     runningAnalysis: false,
     loadcases: false,
@@ -107,41 +107,51 @@ export default defineStore("global", () => {
     const currentResult = current.value.result;
 
     if (currentResult.isCombination) {
-      if (results.value.combinations.members == null) return result;
+      if (results.value.combinations.members === null) {
+        return result;
+      }
       currentCase = results.value.combinations.members[currentResult.id];
     } else {
-      if (results.value.loadcases.members == null) return result;
+      if (results.value.loadcases.members === null) {
+        return result;
+      }
       currentCase = results.value.loadcases.members[currentResult.id];
     }
 
     currentCase.forEach((member) => {
-      const moment_first = member.moment.at(0);
-      const moment_last = member.moment.at(-1);
-      if (moment_first != undefined)
-        result.moment = Math.max(result.moment, Math.abs(moment_first));
-      if (moment_last != undefined)
-        result.moment = Math.max(result.moment, Math.abs(moment_last));
+      const momentFirst = member.moment.at(0);
+      const momentLast = member.moment.at(-1);
+      if (momentFirst != undefined) {
+        result.moment = Math.max(result.moment, Math.abs(momentFirst));
+      }
+      if (momentLast != undefined) {
+        result.moment = Math.max(result.moment, Math.abs(momentLast));
+      }
       result.moment = Math.max(
         result.moment,
-        Math.abs(member.max_moment[1]),
-        Math.abs(member.min_moment[1]),
+        Math.abs(member.maxMoment[1]),
+        Math.abs(member.minMoment[1]),
       );
 
-      const shear_first = member.shear.at(0);
-      const shear_last = member.shear.at(-1);
-      if (shear_first != undefined)
-        result.shear = Math.max(result.shear, Math.abs(shear_first));
-      if (shear_last != undefined)
-        result.shear = Math.max(result.shear, Math.abs(shear_last));
-      result.shear = Math.max(result.shear, Math.abs(member.vert_shear[1]));
+      const shearFirst = member.shear.at(0);
+      const shearLast = member.shear.at(-1);
+      if (shearFirst != undefined) {
+        result.shear = Math.max(result.shear, Math.abs(shearFirst));
+      }
+      if (shearLast != undefined) {
+        result.shear = Math.max(result.shear, Math.abs(shearLast));
+      }
+      result.shear = Math.max(result.shear, Math.abs(member.vertShear[1]));
 
-      const normal_first = member.normal.at(0);
-      const normal_last = member.normal.at(-1);
-      if (normal_first != undefined)
-        result.normal = Math.max(result.normal, Math.abs(normal_first));
-      if (normal_last != undefined)
-        result.normal = Math.max(result.normal, Math.abs(normal_last));
-      result.normal = Math.max(result.normal, Math.abs(member.vert_normal[1]));
+      const normalFirst = member.normal.at(0);
+      const normalLast = member.normal.at(-1);
+      if (normalFirst != undefined) {
+        result.normal = Math.max(result.normal, Math.abs(normalFirst));
+      }
+      if (normalLast != undefined) {
+        result.normal = Math.max(result.normal, Math.abs(normalLast));
+      }
+      result.normal = Math.max(result.normal, Math.abs(member.vertNormal[1]));
     });
 
     result.moment = result.moment != 0 ? result.moment : 1;
@@ -151,120 +161,54 @@ export default defineStore("global", () => {
     return result;
   });
 
-  async function newFile(): Promise<void> {
-    const fileChanged = (await invoke("unsaved_changes")) as boolean;
-
-    if (fileChanged) {
-      const unsavedDiscard = await ask(t("dialogs.native.unsavedChanges"), {
-        title: t("dialogs.native.unsavedChangesTitle"),
-        type: "warning",
-        okLabel: t("dialogs.native.buttons.yes"),
-        cancelLabel: t("dialogs.native.buttons.no"),
+  async function analysisRun(): Promise<void> {
+    dialogs.value.runningAnalysis = true;
+    try {
+      const response = await invoke("analysis_run_linear").catch((e) => {
+        appAlert(e);
       });
+      const result = response as [
+        ResultsDict,
+        ReactionsDict,
+        ResultsDict,
+        ReactionsDict,
+      ];
 
-      if (!unsavedDiscard) {
-        return;
-      }
+      select([], []);
+      results.value.loadcases.members = result[0];
+      results.value.loadcases.reactions = result[1];
+
+      results.value.combinations.members = result[2];
+      results.value.combinations.reactions = result[3];
+
+      results.value.selected.id = null;
+      results.value.selected.position = null;
+
+      current.value.clickType = ClickType.Result;
+      current.value.sideBarType = SideBarType.Result;
+    } catch (error) {
+      const e = error as string[];
+      appAlert(t(e[0], e[1]));
+    } finally {
+      dialogs.value.runningAnalysis = false;
     }
-
-    const result = await invoke("new_file").catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
-
-    const [undoLen, redoLen] = result as [number, number];
-    historyLength.value.undo = undoLen;
-    historyLength.value.redo = redoLen;
-
-    await fetchEverything();
-    current.value.sideBarType = SideBarType.Select;
-    current.value.clickType = ClickType.Select;
   }
 
-  async function openFile(): Promise<void> {
-    const fileChanged = (await invoke("unsaved_changes")) as boolean;
+  function appAlert(text: string): void {
+    dialogs.value.alert.text = text;
+    dialogs.value.alert.show = true;
+  }
 
-    if (fileChanged) {
-      const unsavedDiscard = await ask(t("dialogs.native.unsavedChanges"), {
-        title: t("dialogs.native.unsavedChangesTitle"),
-        type: "warning",
-        okLabel: t("dialogs.native.buttons.yes"),
-        cancelLabel: t("dialogs.native.buttons.no"),
+  async function appCursorSnap(windowPos: IPoint): Promise<void> {
+    await appWindow
+      .setCursorPosition(new LogicalPosition(windowPos.x, windowPos.y))
+      .catch((e: string[]) => {
+        appAlert(t(e[0], [e[1]]));
       });
-
-      if (!unsavedDiscard) {
-        return;
-      }
-    }
-
-    const selectedFile = await open({
-      title: t("dialogs.native.openFileTitle"),
-      multiple: false,
-      filters: [
-        {
-          name: t("dialogs.native.fileType"),
-          extensions: ["pnn"],
-        },
-      ],
-    });
-
-    if (selectedFile == null || Array.isArray(selectedFile)) return;
-
-    const result = await invoke("open_file", { path: selectedFile }).catch(
-      (e: string[]) => showAlert(t(e[0], [e[1]])),
-    );
-
-    const [undoLen, redoLen] = result as [number, number];
-    historyLength.value.undo = undoLen;
-    historyLength.value.redo = redoLen;
-
-    await fetchEverything();
-    current.value.sideBarType = SideBarType.Select;
-    current.value.clickType = ClickType.Select;
   }
 
-  async function saveFile(): Promise<void> {
-    const currentFile = (await invoke("get_current_file")) as string;
-
-    let savePath: string | null;
-    if (currentFile.trim() == "") {
-      savePath = await save({
-        title: t("dialogs.native.saveFileTitle"),
-        filters: [
-          {
-            name: t("dialogs.native.fileType"),
-            extensions: ["pnn"],
-          },
-        ],
-      });
-    } else {
-      savePath = currentFile;
-    }
-    if (savePath == null) return;
-
-    await invoke("save_file", { path: savePath }).catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
-  }
-
-  async function saveFileAs(): Promise<void> {
-    const savePath = await save({
-      title: t("dialogs.native.saveFileTitle"),
-      filters: [
-        {
-          name: t("dialogs.native.fileType"),
-          extensions: ["pnn"],
-        },
-      ],
-    });
-    if (savePath == null) return;
-
-    await invoke("save_file", { path: savePath }).catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
-  }
-
-  async function exitApp(): Promise<void> {
-    const fileChanged = (await invoke("unsaved_changes")) as boolean;
+  async function appExit(): Promise<void> {
+    const fileChanged = await invoke("file_unsaved_changes");
     if (fileChanged) {
       const unsavedDiscard = await ask(t("dialogs.native.unsavedChanges"), {
         title: t("dialogs.native.unsavedChangesTitle"),
@@ -281,48 +225,74 @@ export default defineStore("global", () => {
     await exit(0);
   }
 
-  function showAlert(text: string): void {
-    showDialog.value.alert.text = text;
-    showDialog.value.alert.show = true;
+  async function appRedo(): Promise<void> {
+    const result = await invoke("app_redo").catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+    const [undoLen, redoLen] = result as [number, number];
+    historyLength.value.undo = undoLen;
+    historyLength.value.redo = redoLen;
+
+    await nodes.fetchNodes();
+    await members.fetchMembers();
   }
 
-  function select(nodes: number[], members: number[]): void {
-    current.value.selected.nodes = [...nodes];
-    current.value.selected.members = [...members];
+  async function appUndo(): Promise<void> {
+    const result = await invoke("app_undo").catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+    const [undoLen, redoLen] = result as [number, number];
+    historyLength.value.undo = undoLen;
+    historyLength.value.redo = redoLen;
+
+    await nodes.fetchNodes();
+    await members.fetchMembers();
   }
 
-  function snapCursorTo(windowPos: IPoint): void {
-    appWindow
-      .setCursorPosition(new LogicalPosition(windowPos.x, windowPos.y))
-      .catch((e: string[]) => showAlert(t(e[0], [e[1]])));
+  async function combinationApplyFactors(
+    factors: Record<number, Record<number, number>>,
+  ): Promise<void> {
+    await invoke("combination_apply_factors", { factors }).catch(
+      (e: string[]) => {
+        appAlert(t(e[0], [e[1]]));
+      },
+    );
+
+    await fetchCombinations();
   }
 
-  async function runAnalysisLinear(): Promise<void> {
-    showDialog.value.runningAnalysis = true;
-    try {
-      const response = await invoke("run_analysis_linear").catch((e) =>
-        showAlert(e),
-      );
-      const result = response as [ResultsDict, ReactionsDict, ResultsDict, ReactionsDict];
+  async function combinationDelete(id: number): Promise<void> {
+    await invoke("combination_delete", { id }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
 
-      select([], []);
-      results.value.loadcases.members = result[0];
-      results.value.loadcases.reactions = result[1];
+    await fetchLoadcases();
+    await fetchCombinations();
+  }
 
-      results.value.combinations.members = result[2];
-      results.value.combinations.reactions = result[3];
+  async function combinationNew(name: string): Promise<void> {
+    await invoke("combination_new", { name }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
 
-      results.value.selected.id = null;
-      results.value.selected.position = null;
+    await fetchLoadcases();
+    await fetchCombinations();
+  }
 
-      current.value.clickType = ClickType.Result;
-      current.value.sideBarType = SideBarType.Result;
-    } catch (error) {
-      const e = error as string[];
-      showAlert(t(e[0], e[1]));
-    } finally {
-      showDialog.value.runningAnalysis = false;
-    }
+  async function combinationUpdate(id: number, name: string): Promise<void> {
+    await invoke("combination_update", { id, name }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+
+    await fetchLoadcases();
+    await fetchCombinations();
+  }
+
+  async function fetchCombinations(): Promise<void> {
+    const result = await invoke("combination_get_dtos").catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+    combinationsList.value = result as ICombination[];
   }
 
   async function fetchEverything(): Promise<void> {
@@ -335,68 +305,284 @@ export default defineStore("global", () => {
 
     await fetchLoadcases();
     await fetchCombinations();
-    await fetchCurrentLoadcaseId();
+    await fetchLoadcaseCurrent();
   }
 
-  async function fetchCurrentLoadcaseId(): Promise<void> {
-    const id = await invoke("get_loadcase_current").catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
+  async function fetchLoadcaseCurrent(): Promise<void> {
+    const id = await invoke("loadcase_get_current").catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
     current.value.loadcase = id as number;
   }
 
   async function fetchLoadcases(): Promise<void> {
-    const result = await invoke("get_loadcase_dtos").catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
+    const result = await invoke("loadcase_get_dtos").catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
     loadcasesList.value = result as ILoadcase[];
   }
 
-  async function fetchCombinations() : Promise<void> {
-    const result = await invoke("get_combination_dtos").catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
-    combinationsList.value = result as ICombination[];
-  }
-
   async function fetchMaterials(): Promise<void> {
-    const result = await invoke("get_material_dtos").catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
+    const result = await invoke("material_get_dtos").catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
     materialsList.value = result as IMaterial[];
   }
 
   async function fetchSections(): Promise<void> {
-    const result = await invoke("get_section_dtos").catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
+    const result = await invoke("section_get_dtos").catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
     sectionsList.value = result as ISection[];
   }
 
-  async function changeCurrentLoadcase(new_id: number): Promise<void> {
-    await invoke("set_loadcase_current", { id: new_id }).catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
+  async function fileNew(): Promise<void> {
+    const fileChanged = await invoke("file_unsaved_changes");
+
+    if (fileChanged) {
+      const unsavedDiscard = await ask(t("dialogs.native.unsavedChanges"), {
+        title: t("dialogs.native.unsavedChangesTitle"),
+        type: "warning",
+        okLabel: t("dialogs.native.buttons.yes"),
+        cancelLabel: t("dialogs.native.buttons.no"),
+      });
+
+      if (!unsavedDiscard) {
+        return;
+      }
+    }
+
+    const result = await invoke("file_new").catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+
+    const [undoLen, redoLen] = result as [number, number];
+    historyLength.value.undo = undoLen;
+    historyLength.value.redo = redoLen;
+
+    await fetchEverything();
+    current.value.sideBarType = SideBarType.Select;
+    current.value.clickType = ClickType.Select;
+  }
+
+  async function fileOpen(): Promise<void> {
+    const fileChanged = await invoke("file_unsaved_changes");
+
+    if (fileChanged) {
+      const unsavedDiscard = await ask(t("dialogs.native.unsavedChanges"), {
+        title: t("dialogs.native.unsavedChangesTitle"),
+        type: "warning",
+        okLabel: t("dialogs.native.buttons.yes"),
+        cancelLabel: t("dialogs.native.buttons.no"),
+      });
+
+      if (!unsavedDiscard) {
+        return;
+      }
+    }
+
+    const selectedFile = await open({
+      title: t("dialogs.native.fileOpenTitle"),
+      multiple: false,
+      filters: [
+        {
+          name: t("dialogs.native.fileType"),
+          extensions: ["pnn"],
+        },
+      ],
+    });
+
+    if (selectedFile === null || Array.isArray(selectedFile)) {
+      return;
+    }
+
+    const result = await invoke("file_open", { path: selectedFile }).catch(
+      (e: string[]) => {
+        appAlert(t(e[0], [e[1]]));
+      },
     );
+
+    const [undoLen, redoLen] = result as [number, number];
+    historyLength.value.undo = undoLen;
+    historyLength.value.redo = redoLen;
+
+    await fetchEverything();
+    current.value.sideBarType = SideBarType.Select;
+    current.value.clickType = ClickType.Select;
+  }
+
+  async function fileSave(): Promise<void> {
+    const currentFile = (await invoke("file_get_current")) as string;
+
+    let savePath: string | null;
+    if (currentFile.trim() == "") {
+      savePath = await save({
+        title: t("dialogs.native.fileSaveTitle"),
+        filters: [
+          {
+            name: t("dialogs.native.fileType"),
+            extensions: ["pnn"],
+          },
+        ],
+      });
+    } else {
+      savePath = currentFile;
+    }
+    if (savePath === null) {
+      return;
+    }
+
+    await invoke("file_save", { path: savePath }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+  }
+
+  async function fileSaveAs(): Promise<void> {
+    const savePath = await save({
+      title: t("dialogs.native.fileSaveTitle"),
+      filters: [
+        {
+          name: t("dialogs.native.fileType"),
+          extensions: ["pnn"],
+        },
+      ],
+    });
+    if (savePath === null) {
+      return;
+    }
+
+    await invoke("file_save", { path: savePath }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+  }
+
+  async function loadcaseChangeCurrent(newId: number): Promise<void> {
+    await invoke("loadcase_set_current", { id: newId }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
     await nodes.fetchNodes();
     await members.fetchMembers();
   }
 
-  async function applyHinges(
+  async function loadcaseDelete(id: number): Promise<void> {
+    await invoke("loadcase_delete", { id }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+
+    await fetchLoadcases();
+    await fetchCombinations();
+  }
+
+  async function loadcaseNew(name: string): Promise<void> {
+    await invoke("loadcase_new", { name }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+
+    await fetchLoadcases();
+    await fetchCombinations();
+  }
+
+  async function loadcaseUpdate(id: number, name: string): Promise<void> {
+    await invoke("loadcase_update", { id, name }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+
+    await fetchLoadcases();
+    await fetchCombinations();
+  }
+
+  async function materialDelete(id: number): Promise<void> {
+    await invoke("material_delete", { id }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+    await fetchMaterials();
+  }
+
+  async function materialNew(
+    name: string,
+    elasticity: number,
+    thermal: number,
+  ): Promise<void> {
+    await invoke("material_new", { name, elasticity, thermal }).catch(
+      (e: string[]) => {
+        appAlert(t(e[0], [e[1]]));
+      },
+    );
+    await fetchMaterials();
+  }
+
+  async function materialUpdate(
+    id: number,
+    name: string,
+    elasticity: number,
+    thermal: number,
+  ): Promise<void> {
+    await invoke("material_update", { id, name, elasticity, thermal }).catch(
+      (e: string[]) => {
+        appAlert(t(e[0], [e[1]]));
+      },
+    );
+    await fetchMaterials();
+  }
+
+  async function sectionDelete(id: number): Promise<void> {
+    await invoke("section_delete", { id }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
+    await fetchSections();
+  }
+
+  async function sectionNew(
+    name: string,
+    sectionType: SectionType,
+    params: number[],
+  ): Promise<void> {
+    await invoke("section_new", { name, sectionType, params }).catch(
+      (e: string[]) => {
+        appAlert(t(e[0], [e[1]]));
+      },
+    );
+    await fetchSections();
+  }
+
+  async function sectionUpdate(
+    id: number,
+    name: string,
+    sectionType: SectionType,
+    params: number[],
+  ): Promise<void> {
+    await invoke("section_update", { id, name, sectionType, params }).catch(
+      (e: string[]) => {
+        appAlert(t(e[0], [e[1]]));
+      },
+    );
+    await fetchSections();
+  }
+
+  function select(nodes: number[], members: number[]): void {
+    current.value.selected.nodes = [...nodes];
+    current.value.selected.members = [...members];
+  }
+
+  async function selectedApplyHinges(
     onNodes: boolean,
     onMemberStarts: boolean,
     onMemberEnds: boolean,
   ): Promise<void> {
     const selected = current.value.selected;
-    if (selected.nodes.length == 0 && selected.members.length == 0)
+    if (selected.nodes.length == 0 && selected.members.length == 0) {
       return;
+    }
 
-    const result = await invoke("apply_hinges", {
+    const result = await invoke("selected_apply_hinges", {
       nodeIds: selected.nodes,
       memberIds: selected.members,
       onNodes,
       onMemberStarts,
       onMemberEnds,
-    }).catch((e: string[]) => showAlert(t(e[0], [e[1]])));
+    }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
     const [undoLen, redoLen] = result as [number, number];
     historyLength.value.undo = undoLen;
     historyLength.value.redo = redoLen;
@@ -405,33 +591,41 @@ export default defineStore("global", () => {
     await members.fetchMembers();
   }
 
-  async function applyMatSec(
+  async function selectedApplyMatSec(
     material: number | null,
     section: number | null,
   ): Promise<void> {
     const selected = current.value.selected;
-    if (selected.members.length == 0) return;
+    if (selected.members.length == 0) {
+      return;
+    }
 
     let result = [0, 0];
 
-    if (material != null && section != null) {
-      const response = await invoke("apply_material_and_section", {
+    if (material !== null && section !== null) {
+      const response = await invoke("selected_apply_material_and_section", {
         ids: selected.members,
         materialId: material,
         sectionId: section,
-      }).catch((e: string[]) => showAlert(t(e[0], [e[1]])));
+      }).catch((e: string[]) => {
+        appAlert(t(e[0], [e[1]]));
+      });
       result = response as [number, number];
-    } else if (material != null) {
-      const response = await invoke("apply_material", {
+    } else if (material !== null) {
+      const response = await invoke("selected_apply_material", {
         ids: selected.members,
         materialId: material,
-      }).catch((e: string[]) => showAlert(t(e[0], [e[1]])));
+      }).catch((e: string[]) => {
+        appAlert(t(e[0], [e[1]]));
+      });
       result = response as [number, number];
-    } else if (section != null) {
-      const response = await invoke("apply_section", {
+    } else if (section !== null) {
+      const response = await invoke("selected_apply_section", {
         ids: selected.members,
         sectionId: section,
-      }).catch((e: string[]) => showAlert(t(e[0], [e[1]])));
+      }).catch((e: string[]) => {
+        appAlert(t(e[0], [e[1]]));
+      });
       result = response as [number, number];
     }
 
@@ -439,100 +633,19 @@ export default defineStore("global", () => {
     historyLength.value.redo = result[1];
   }
 
-  async function newMaterial(
-    name: string,
-    elasticity: number,
-    thermal: number,
-  ): Promise<void> {
-    await invoke("new_material", { name, elasticity, thermal }).catch(
-      (e: string[]) => showAlert(t(e[0], [e[1]])),
-    );
-    await fetchMaterials();
-  }
-
-  async function updateMaterial(
-    id: number,
-    name: string,
-    elasticity: number,
-    thermal: number,
-  ): Promise<void> {
-    await invoke("update_material", { id, name, elasticity, thermal }).catch(
-      (e: string[]) => showAlert(t(e[0], [e[1]])),
-    );
-    await fetchMaterials();
-  }
-
-  async function deleteMaterial(id: number): Promise<void> {
-    await invoke("delete_material", { id }).catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
-    await fetchMaterials();
-  }
-
-  async function newSection(
-    name: string,
-    sectionType: SectionType,
-    params: number[],
-  ): Promise<void> {
-    await invoke("new_section", { name, sectionType, params }).catch(
-      (e: string[]) => showAlert(t(e[0], [e[1]])),
-    );
-    await fetchSections();
-  }
-
-  async function updateSection(
-    id: number,
-    name: string,
-    sectionType: SectionType,
-    params: number[],
-  ): Promise<void> {
-    await invoke("update_section", { id, name, sectionType, params }).catch(
-      (e: string[]) => showAlert(t(e[0], [e[1]])),
-    );
-    await fetchSections();
-  }
-
-  async function deleteSection(id: number): Promise<void> {
-    await invoke("delete_section", { id }).catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
-    await fetchSections();
-  }
-
-  async function undo(): Promise<void> {
-    const result = await invoke("undo").catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
-    const [undoLen, redoLen] = result as [number, number];
-    historyLength.value.undo = undoLen;
-    historyLength.value.redo = redoLen;
-
-    await nodes.fetchNodes();
-    await members.fetchMembers();
-  }
-
-  async function redo(): Promise<void> {
-    const result = await invoke("redo").catch((e: string[]) =>
-      showAlert(t(e[0], [e[1]])),
-    );
-    const [undoLen, redoLen] = result as [number, number];
-    historyLength.value.undo = undoLen;
-    historyLength.value.redo = redoLen;
-
-    await nodes.fetchNodes();
-    await members.fetchMembers();
-  }
-
-  async function deleteSelected(): Promise<void> {
+  async function selectedDelete(): Promise<void> {
     const selected = current.value.selected;
 
-    if (selected.members.length == 0 && selected.nodes.length == 0)
+    if (selected.members.length == 0 && selected.nodes.length == 0) {
       return;
+    }
 
-    const result = await invoke("delete_selected", {
+    const result = await invoke("selected_delete", {
       nodeIds: selected.nodes,
       memberIds: selected.members,
-    }).catch((e: string[]) => showAlert(t(e[0], [e[1]])));
+    }).catch((e: string[]) => {
+      appAlert(t(e[0], [e[1]]));
+    });
 
     const [undoLen, redoLen] = result as [number, number];
     historyLength.value.undo = undoLen;
@@ -549,7 +662,7 @@ export default defineStore("global", () => {
     sectionsList,
 
     canvasProps,
-    showDialog,
+    dialogs,
     current,
 
     historyLength,
@@ -557,39 +670,47 @@ export default defineStore("global", () => {
     results,
     resultsExtrema,
 
-    exitApp,
-    newFile,
-    openFile,
-    saveFile,
-    saveFileAs,
+    appAlert,
+    appCursorSnap,
+    appExit,
+    appRedo,
+    appUndo,
 
-    runAnalysisLinear,
+    fileNew,
+    fileOpen,
+    fileSave,
+    fileSaveAs,
 
-    showAlert,
-    select,
-    snapCursorTo,
+    analysisRun,
 
-    fetchEverything,
-    fetchCurrentLoadcaseId,
-    fetchLoadcases,
+    combinationApplyFactors,
+    combinationDelete,
+    combinationNew,
+    combinationUpdate,
+
     fetchCombinations,
+    fetchEverything,
+    fetchLoadcaseCurrent,
+    fetchLoadcases,
     fetchMaterials,
     fetchSections,
 
-    changeCurrentLoadcase,
-    applyHinges,
-    applyMatSec,
+    loadcaseChangeCurrent,
+    loadcaseDelete,
+    loadcaseNew,
+    loadcaseUpdate,
 
-    newMaterial,
-    updateMaterial,
-    deleteMaterial,
+    materialDelete,
+    materialNew,
+    materialUpdate,
 
-    newSection,
-    updateSection,
-    deleteSection,
+    sectionDelete,
+    sectionNew,
+    sectionUpdate,
 
-    undo,
-    redo,
-    deleteSelected,
+    select,
+    selectedApplyHinges,
+    selectedApplyMatSec,
+    selectedDelete,
   };
 });

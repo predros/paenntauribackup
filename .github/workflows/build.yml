@@ -1,0 +1,42 @@
+name: Build and Release
+
+on:
+  workflow_dispatch
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+      with:
+        rust-version: stable 
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - name: Install Yarn
+      run: npm install -g yarn
+
+    - name: Install Dependencies
+      run: yarn install 
+
+    - name: Build package
+      run: yarn tauri build
+
+    - name: Commit new build
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+          git add -A docs/rss.xml
+          git commit -a -m "Atualizando xml do feed"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main

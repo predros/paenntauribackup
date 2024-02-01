@@ -1,0 +1,1 @@
+sudo act -s GITHUB_TOKEN="$(gh auth token)" -P ubuntu-latest=node
